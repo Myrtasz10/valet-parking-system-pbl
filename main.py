@@ -1,4 +1,4 @@
-from parser import Parser
+from parser_1 import Parser
 
 if __name__ == '__main__':
     parser = Parser()
