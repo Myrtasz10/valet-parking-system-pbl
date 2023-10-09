@@ -33,6 +33,7 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="app_window.py" />
     <Compile Include="main.py" />
     <Compile Include="parser_1.py" />
   </ItemGroup>

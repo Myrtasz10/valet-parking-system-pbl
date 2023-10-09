@@ -39,11 +39,10 @@ class Parser:
         self.output_label = QLabel('')
 
         self.submit_button = QPushButton('Submit')
-        self.submit_button.clicked.connect(self.on_submit())
-        
+        self.submit_button.clicked.connect(self.on_submit)
+
         # Create a vertical layout to arrange the widgets
         layout = QVBoxLayout()
-
         layout.addWidget(self.parking_spots_label)
         layout.addWidget(self.parking_spots_input)
         layout.addWidget(self.agv_shuttles_label)
@@ -60,7 +59,7 @@ class Parser:
         layout.addWidget(self.output_label)
         self.window.setLayout(layout)
 
-    def on_submit(self, layout):
+    def on_submit(self):
         # Retrieve and store the entered data in instance variables
         self.parking_spots = self.parking_spots_input.text()
         self.agv_shuttles = self.agv_shuttles_input.text()
@@ -68,8 +67,8 @@ class Parser:
         self.parking_spot_width = self.parking_spot_width_input.text()
         self.parking_spot_height = self.parking_spot_height_input.text()
         self.speed = self.speed_input.text()
-        
-        # Close the window
+
+        # Close the window after submitting
         self.window.close()
 
     def run(self):
