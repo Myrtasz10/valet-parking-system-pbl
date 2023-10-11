@@ -1,7 +1,9 @@
-from app_window import TableExample
+from app_window import Table
 from parser_1 import Parser
-import asyncio
-import time
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFrame, \
+                            QHBoxLayout, QVBoxLayout
+from PyQt5.QtCore import QRect, QPropertyAnimation
 
 if __name__ == '__main__':
     parser = Parser()
@@ -15,9 +17,14 @@ if __name__ == '__main__':
     print(f'Parking spot height: {parser.parking_spot_height}')
     print(f'AGV shuttles speed: {parser.speed}')
     
-    app_window = TableExample()
-    app_window.run()
+    app = QApplication(sys.argv)
+    table = Table()
+    table.show()
     
+    try:
+        sys.exit(app.exec_())
+    except SystemExit:
+        print('Closing Window...')
 #    while(True):
 #        app_window.start_animation(220, 128)
 #        time.sleep(0.5)
