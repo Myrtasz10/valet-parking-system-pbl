@@ -5,8 +5,10 @@ from PyQt5.QtGui import QColor, QBrush, QPainter
 from PyQt5.QtCore import QPropertyAnimation, QTimer, Qt, QPoint, QRect, QVariantAnimation, QTimeLine, QPointF
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsRectItem
 
-class Table(QWidget):
+class Table(QWidget):  
     def __init__(self):
+        self.app = QApplication(sys.argv)
+        self.window = QWidget()
         super().__init__()
         self.window_width, self.window_height = 800, 600
         self.setMinimumSize(self.window_width, self.window_height)
@@ -19,36 +21,6 @@ class Table(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        # Create a QGraphicsView to hold the table
-        graphics_view = QGraphicsView()
-        # Create a QGraphicsScene
-        scene = QGraphicsScene()
-        graphics_view.setScene(scene)
-        graphics_view.setMinimumSize(500, 500)
-        graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        # Set the number of rows and columns
-        table_widget = QTableWidget()
-
-        # Set the number of rows and columns
-        table_widget.setRowCount(3)
-        table_widget.setColumnCount(3)
-
-        # Set the item size for table cells
-        cell_size = 100  # Adjust this value as needed
-        table_widget.verticalHeader().setDefaultSectionSize(cell_size)
-        table_widget.horizontalHeader().setDefaultSectionSize(cell_size)
-
-        # Populate the table with items (rectangular cells)
-        for i in range(3):
-            for j in range(3):
-                item = QTableWidgetItem()
-                table_widget.setItem(i, j, item)
-
-        table_widget.resize(317, 325)
-        scene.addWidget(table_widget)
-
         self.button = QPushButton('Start', clicked=self.animation)
         self.layout.addWidget(self.button)
 
@@ -57,6 +29,28 @@ class Table(QWidget):
         self.frame.setFrameStyle(QFrame.Panel | QFrame.Raised)
         self.frame.move(10, 10)
         self.frame.resize(100, 100)
+        
+        table_widget = QTableWidget()
+
+        # Set the number of rows and columns
+        table_widget.setRowCount(3)
+        table_widget.setColumnCount(3)
+        
+        cell_size = 100
+        
+        for i in range(3):
+            table_widget.setColumnWidth(i, cell_size)
+            table_widget.setRowHeight(i, cell_size)
+
+        # Populate the table with items (rectangular cells)
+        for i in range(3):
+            for j in range(3):
+                item = QTableWidgetItem()
+                table_widget.setItem(i, j, item)
+
+        self.layout.addWidget(table_widget)
+        self.window.setLayout(self.layout)  # Set the layout for the main window
+        self.window.setWindowTitle("3x3 Table Example")
 
     def animation(self):
         self.animation = QPropertyAnimation(self.frame, b'geometry')

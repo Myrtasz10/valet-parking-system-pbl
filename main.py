@@ -17,12 +17,11 @@ if __name__ == '__main__':
     print(f'Parking spot height: {parser.parking_spot_height}')
     print(f'AGV shuttles speed: {parser.speed}')
     
-    app = QApplication(sys.argv)
     table = Table()
     table.show()
     
     try:
-        sys.exit(app.exec_())
+        sys.exit(table.app.exec_())
     except SystemExit:
         print('Closing Window...')
 #    while(True):
