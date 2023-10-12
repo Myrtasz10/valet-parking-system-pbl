@@ -40,6 +40,7 @@ class Table(QWidget):
         self.frame.move(124, 128)
         self.frame.resize(90, 90)
         
+    # create the table
     def addGrid(self):
         cell_size = 100
         num_rows = 3
@@ -53,6 +54,7 @@ class Table(QWidget):
                 rect_item.setPen(QColor(Qt.black))  # Grid lines' color
                 self.scene.addItem(rect_item)
 
+    # animate the red box
     def animation(self):
         self.animation = QPropertyAnimation(self.frame, b'geometry')
         self.animation.setDuration(1000) # mm seconds
