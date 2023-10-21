@@ -10,6 +10,7 @@ class ParkingLot(QWidget):
         super().__init__()
         self.parser = parser
         self.parking_spaces = []
+        self.cars = []
         self.parking_width = int(parser.parking_spot_width) * 50
         self.parking_height = int(parser.parking_spot_height) * 50
         self.num_rows = int(parser.parking_spots_rows)
@@ -56,4 +57,5 @@ class ParkingLot(QWidget):
         y = int((position.y() - self.parking_height / 2) // 
                 self.parking_height * self.parking_height + 5)
         car = Car(x, y, self.parking_width - 10, self.parking_height - 10, self.parser.speed)
+        self.cars.append(car)
         self.scene.addItem(car)
