@@ -5,24 +5,21 @@ class Parser:
         self.app = QApplication([])
         self.window = QWidget()
         self.window.setWindowTitle('Valet Parking System')
-        self.parking_spots = None
-        self.agv_shuttles = None
-        self.depots = None
-        self.parking_spot_width = None
-        self.parking_spot_height = None
-        self.speed = None
         self.setup_ui()
 
     def setup_ui(self):
         layout = QVBoxLayout()
-        self.parking_spots_input = QLineEdit()
-        self.agv_shuttles_input = QLineEdit()
-        self.depots_input = QLineEdit()
-        self.parking_spot_width_input = QLineEdit()
-        self.parking_spot_height_input = QLineEdit()
-        self.speed_input = QLineEdit()
+        
+        self.parking_spots_input = QLineEdit("4")
+        self.agv_shuttles_input = QLineEdit("1")
+        self.depots_input = QLineEdit("1")
+        self.parking_spot_width_input = QLineEdit("2")
+        self.parking_spot_height_input = QLineEdit("2")
+        self.speed_input = QLineEdit("2")
+        
         self.submit_button = QPushButton('Submit')
         self.submit_button.clicked.connect(self.on_submit)
+        
         layout.addWidget(QLabel('Number of parking spots:'))
         layout.addWidget(self.parking_spots_input)
         layout.addWidget(QLabel('Number of AGV shuttles:'))
@@ -36,6 +33,7 @@ class Parser:
         layout.addWidget(QLabel('AGV shuttles speed:'))
         layout.addWidget(self.speed_input)
         layout.addWidget(self.submit_button)
+        
         self.window.setLayout(layout)
 
     def on_submit(self):
