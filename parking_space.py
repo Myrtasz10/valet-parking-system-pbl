@@ -6,7 +6,8 @@ class ParkingSpace(QGraphicsRectItem):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
         self.setPen(QPen(QColor(Qt.black)))
-        self.setAcceptHoverEvents(True)  # Enable hover events
+        self.setAcceptHoverEvents(True)
+        self.occupied = False
 
     def hoverEnterEvent(self, event):
         self.setPen(QPen(QColor('#333333'), 2))

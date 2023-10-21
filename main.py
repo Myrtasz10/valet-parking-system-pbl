@@ -12,7 +12,6 @@ if __name__ == '__main__':
     parking_lot = ParkingLot(parser)
     parking_lot.show()
 
-
     try:
         sys.exit(app.exec_())
     except SystemExit:

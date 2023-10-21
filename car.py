@@ -6,11 +6,13 @@ from PyQt5.QtCore import QObject, pyqtSignal
 class Car(QGraphicsRectItem):
     settingDestinationSignal = pyqtSignal(object) 
 
-    def __init__(self, x, y, width, height):
-        super(Car, self).__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, speed):
+        super().__init__(x, y, width, height)
         self.setBrush(QColor('#ff0000'))
         self.setAcceptHoverEvents(True)
-        self.setting_destination = False
+        self.speed = speed
+        self.parking_space_width = width + 10
+        self.parking_space_height = height + 10
 
     def hoverEnterEvent(self, event):
         self.setBrush(QColor('#cc0000'))
@@ -63,15 +65,16 @@ class Car(QGraphicsRectItem):
         for _ in range(abs(int(moves_down))):
             self.move_down() if moves_down > 0 else self.move_up()
 
-    def animate(self, start_space, end_space, cell_size, speed, distance):
+    def animate(self, start_space, end_space, 
+                parking_space_width, parking_space_height, speed, distance):
         time = float(distance) / float(speed)
         time *= 1000
         time = int(time)
 
-        start_x = start_space[1] * cell_size
-        start_y = start_space[0] * cell_size
-        end_x = end_space[1] * cell_size
-        end_y = end_space[0] * cell_size
+        start_x = start_space[1] * parking_space_width
+        start_y = start_space[0] * parking_space_height
+        end_x = end_space[1] * parking_space_width
+        end_y = end_space[0] * parking_space_height
 
         self.animation = QVariantAnimation()
         self.animation.setDuration(time)
@@ -81,13 +84,45 @@ class Car(QGraphicsRectItem):
         self.animation.start()
 
     def move_up(self):
-        self.animate((self.y() // 100, self.x() // 100), ((self.y() - 100) // 100, self.x() // 100), 100, 1, 1)
+        start_space = (self.y() // self.parking_space_height, self.x() // self.parking_space_width)
+        end_space = (start_space[0] - 1, start_space[1])
+        distance = self.parking_space_height / 50
+
+        self.animate(start_space, 
+                     end_space, 
+                     self.parking_space_width,
+                     self.parking_space_height, 
+                     self.speed, distance)
 
     def move_down(self):
-        self.animate((self.y() // 100, self.x() // 100), ((self.y() + 100) // 100, self.x() // 100), 100, 1, 1)
+        start_space = (self.y() // self.parking_space_height, self.x() // self.parking_space_width)
+        end_space = (start_space[0] + 1, start_space[1])
+        distance = self.parking_space_height / 50
+
+        self.animate(start_space, 
+                     end_space, 
+                     self.parking_space_width,
+                     self.parking_space_height, 
+                     self.speed, distance)
 
     def move_left(self):
-        self.animate((self.y() // 100, self.x() // 100), (self.y() // 100, (self.x() - 100) // 100), 100, 1, 1)
+        start_space = (self.y() // self.parking_space_height, self.x() // self.parking_space_width)
+        end_space = (start_space[0], start_space[1] - 1)
+        distance = self.parking_space_width / 50
+
+        self.animate(start_space, 
+                     end_space, 
+                     self.parking_space_width,
+                     self.parking_space_height, 
+                     self.speed, distance)
 
     def move_right(self):
-        self.animate((self.y() // 100, self.x() // 100), (self.y() // 100, (self.x() + 100) // 100), 100, 1, 1)
+        start_space = (self.y() // self.parking_space_height, self.x() // self.parking_space_width)
+        end_space = (start_space[0], start_space[1] + 1)
+        distance = self.parking_space_width / 50
+
+        self.animate(start_space, 
+                     end_space, 
+                     self.parking_space_width,
+                     self.parking_space_height, 
+                     self.speed, distance)

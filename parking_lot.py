@@ -9,8 +9,12 @@ class ParkingLot(QWidget):
     def __init__(self, parser):
         super().__init__()
         self.parser = parser
+        self.parking_spaces = []
+        self.parking_width = int(parser.parking_spot_width) * 50
+        self.parking_height = int(parser.parking_spot_height) * 50
+        self.num_rows = int(parser.parking_spots_rows)
+        self.num_cols = int(parser.parking_spots_cols)
         self.initUI()
-        self.selected_car = None
 
     def initUI(self):
         self.layout = QVBoxLayout()
@@ -21,59 +25,35 @@ class ParkingLot(QWidget):
         self.view.setScene(self.scene)
         self.addGrid()
 
-        num_rows = int(self.parser.parking_spots)
-        num_cols = int(self.parser.parking_spots)
 
-        cell_size = 100  # Assuming each parking space is 100x100 pixels
-        window_width = (num_cols + 1) * cell_size
-        window_height = (num_rows + 1) * cell_size
+        window_width = (self.num_cols + 1) * self.parking_width
+        window_height = (self.num_rows + 1) * self.parking_height
 
         # Set the fixed window size
         self.setFixedSize(window_width, window_height)
 
     def contextMenuEvent(self, event):
+        pos = event.pos()
         contextMenu = QMenu(self)
         addCar = QAction('Add Car', self)
-        addCar.triggered.connect(lambda: self.addCar(event.pos()))
+        addCar.triggered.connect(lambda: self.addCar(pos))
         contextMenu.addAction(addCar)
-
-        if self.selected_car and self.selected_car.setting_destination:
-            goHere = QAction('Go Here', self)
-            goHere.triggered.connect(lambda: self.goHere(event.pos()))
-            contextMenu.addAction(goHere)
-
         contextMenu.exec_(event.globalPos())
 
     def addGrid(self):
-        cell_size = 100
-        num_rows = int(self.parser.parking_spots)
-        num_cols = int(self.parser.parking_spots)
-        for row in range(num_rows):
-            for col in range(num_cols):
-                x = col * cell_size
-                y = row * cell_size
-                parking_space = ParkingSpace(x, y, cell_size, cell_size)  # Create an instance of your custom class
+        for row in range(self.num_rows):
+            for col in range(self.num_cols):
+                x = col * self.parking_width
+                y = row * self.parking_height
+                parking_space = ParkingSpace(x, y, self.parking_width, self.parking_height)
+                self.parking_spaces.append(parking_space)
                 self.scene.addItem(parking_space)  # Add it to the scene
 
 
     def addCar(self, position):
-        cell_size = 100
-        x = int((position.x() - 50) // cell_size * cell_size + (cell_size - 90) / 2)
-        y = int((position.y() - 50) // cell_size * cell_size + (cell_size - 90) / 2)
-        car = Car(x, y, 90, 90)
-        # car.settingDestinationSignal.connect(self.setSelectedCar) 
+        x = int((position.x() - self.parking_width / 2) 
+                // self.parking_width * self.parking_width + 5)
+        y = int((position.y() - self.parking_height / 2) // 
+                self.parking_height * self.parking_height + 5)
+        car = Car(x, y, self.parking_width - 10, self.parking_height - 10, self.parser.speed)
         self.scene.addItem(car)
-
-
-    def goHere(self, position):
-        cell_size = 100
-        x = position.x() // cell_size
-        y = position.y() // cell_size
-        destination = QPoint(int(x), int(y))
-        self.selected_car.moveToDestination(destination)
-        self.selected_car.setting_destination = False
-        self.selected_car = None  # Reset the selected car
-
-
-    def setSelectedCar(self, car):
-        self.selected_car = car
