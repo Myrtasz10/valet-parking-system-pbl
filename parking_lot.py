@@ -68,6 +68,7 @@ class ParkingLot(QWidget):
         self.cars.append(car)
         self.scene.addItem(car)
 
-        self.parking_spaces[col][row].occupied = True 
+        self.parking_spaces[col][row].car = car
+        self.parking_spaces[col][row].occupied = True
 
         

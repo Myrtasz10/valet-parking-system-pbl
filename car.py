@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction
+from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction, QInputDialog
 from PyQt5.QtCore import QVariantAnimation, QPointF, QPoint
 from PyQt5.QtCore import QObject, pyqtSignal
 from parking_space import ParkingSpace, ParkingSpaceSingleton
@@ -54,9 +54,9 @@ class Car(QGraphicsRectItem):
         
         contextMenu.addMenu(moveMenu)
         
-        # setDestination = QAction('Set Destination')
-        # setDestination.triggered.connect(self.activateSetDestination)
-        # contextMenu.addAction(setDestination)
+        # goToDestination = QAction('Go to Destination')
+        # goToDestination.triggered.connect(self.go_to_destination)
+        # contextMenu.addAction(goToDestination)
         
         contextMenu.exec_(event.screenPos())
 
@@ -100,6 +100,9 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[start_space[0]][start_space[1]].occupied = False 
         self.parking_spaces[end_space[0]][end_space[1]].occupied = True 
 
+        self.parking_spaces[start_space[0]][start_space[1]].car = None 
+        self.parking_spaces[end_space[0]][end_space[1]].car = self
+
     def move_down(self):
         start_space = (self.col, self.row)
         end_space = (self.col, self.row + 1)
@@ -117,6 +120,9 @@ class Car(QGraphicsRectItem):
         
         self.parking_spaces[start_space[0]][start_space[1]].occupied = False 
         self.parking_spaces[end_space[0]][end_space[1]].occupied = True 
+
+        self.parking_spaces[start_space[0]][start_space[1]].car = None 
+        self.parking_spaces[end_space[0]][end_space[1]].car = self
 
     def move_left(self):
         start_space = (self.col, self.row)
@@ -136,6 +142,9 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[start_space[0]][start_space[1]].occupied = False 
         self.parking_spaces[end_space[0]][end_space[1]].occupied = True 
 
+        self.parking_spaces[start_space[0]][start_space[1]].car = None 
+        self.parking_spaces[end_space[0]][end_space[1]].car = self
+
     def move_right(self):
         start_space = (self.col, self.row)
         end_space = (self.col + 1, self.row)
@@ -153,3 +162,18 @@ class Car(QGraphicsRectItem):
         
         self.parking_spaces[start_space[0]][start_space[1]].occupied = False 
         self.parking_spaces[end_space[0]][end_space[1]].occupied = True 
+
+        self.parking_spaces[start_space[0]][start_space[1]].car = None 
+        self.parking_spaces[end_space[0]][end_space[1]].car = self
+
+
+    # def go_to_destination(self):
+    #     col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
+    #     row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+
+    #     if ok1 and ok2:
+    #         destination = (col, row)
+    #         car_space = (self.col, self.row)
+            
+    #         result = move_car_to_destination(self.parking_spaces, car_space, destination)
+    #         print(result)  # Or handle the result in some other way
