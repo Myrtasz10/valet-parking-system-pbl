@@ -14,3 +14,12 @@ class ParkingSpace(QGraphicsRectItem):
 
     def hoverLeaveEvent(self, event):
         self.setPen(QPen(QColor('#000000'), 1))
+
+class ParkingSpaceSingleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(ParkingSpaceSingleton, cls).__new__(cls)
+            cls._instance.parking_spaces = []
+        return cls._instance
