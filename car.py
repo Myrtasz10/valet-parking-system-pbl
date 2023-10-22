@@ -87,10 +87,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col, self.row - 1)
         distance = self.parking_space_height / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
-
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
         self.animate(start_space, 
                      end_space, 
                      self.parking_space_width,
@@ -104,10 +106,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col, self.row + 1)
         distance = self.parking_space_height / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
-
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
 
         self.animate(start_space, 
                      end_space, 
@@ -122,10 +126,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col - 1, self.row)
         distance = self.parking_space_width / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
-
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
 
         self.animate(start_space, 
                      end_space, 
@@ -140,9 +146,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col + 1, self.row)
         distance = self.parking_space_width / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
 
 
         self.animate(start_space, 
