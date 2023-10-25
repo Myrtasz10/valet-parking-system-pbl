@@ -172,6 +172,6 @@ class Car(QGraphicsRectItem):
         for parking_column in self.parking_spaces:
             for parking_space in parking_column:
                 print(parking_space.occupied)
-        self.parking_lot.moveCarToDepot(self.col, self.row)
+        self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
         
         

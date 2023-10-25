@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene,
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QContextMenuEvent
 from random import randint
-import numpy
+import copy
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 
@@ -70,14 +70,98 @@ class ParkingLot(QWidget):
         self.scene.addItem(car)
 
         self.parking_spaces[col][row].occupied = True 
-    
         
-    def moveCarToDepot(self, col, row):
-        parking_lot = numpy.zeros((self.num_rows, self.num_cols))
-        for parking_column in self.parking_lot:
+    #Dijkstra
+    #self; desired vehicle column; row; parking lot history in Dijkstra; parking lot
+    def pathfindToDepot(self, col, row, history, parking_lot):
+        print(str(col), str(row))
+        if col == 0 and row == 0:
+            #histories are being printed, now extract and execute them (idk where you put the function to do that, preferably in car.py)
+            print("path found!")
+            print(history)
+            return
+        if parking_lot in history:
+            return
+        
+        #apparently .append uses the reference to parking_lot, so a copy has to be made
+        history.append(copy.deepcopy(parking_lot))
+
+        c = 0
+        for parking_column in parking_lot:
+            r = 0
             for parking_space in parking_column:
                 if parking_space is True:
-                    
+                    print(str(c), str(self.num_cols))
+                    print(str(r), str(self.num_rows))
+                    # left
+                    if c > 0:
+                        if not parking_lot[c-1][r]:
+                            print("left")
+                            print(parking_lot)
+                            parking_lot[c][r] = False
+                            parking_lot[c-1][r] = True
+                            
+                            if c == col and r == row:
+                                self.pathfindToDepot(col-1, row, history, parking_lot)
+                            else:
+                                self.pathfindToDepot(col, row, history, parking_lot)
+                                
+                            print("exit left")
+                            print(parking_lot)
+                            parking_lot[c][r] = True
+                            parking_lot[c-1][r] = False
+                            print(parking_lot)
+                    #up
+                    if r > 0: 
+                        if not parking_lot[c][r-1]:
+                            print("up")
+                            print(parking_lot)
+                            parking_lot[c][r] = False
+                            parking_lot[c][r-1] = True
+                            if c == col and r == row:
+                                self.pathfindToDepot(col, row-1, history, parking_lot)
+                            else:
+                                self.pathfindToDepot(col, row, history, parking_lot)
+                            print("exit up")
+                            print(parking_lot)
+                            parking_lot[c][r] = True
+                            parking_lot[c][r-1] = False         
+                            print(parking_lot)
+
+                    #right
+                    if c < self.num_cols - 1:
+                        if not parking_lot[c+1][r]:
+                            print("right")
+                            print(parking_lot)
+                            parking_lot[c][r] = False
+                            parking_lot[c+1][r] = True
+                            if c == col and r == row:
+                                self.pathfindToDepot(col+1, row, history, parking_lot)
+                            else:
+                                self.pathfindToDepot(col, row, history, parking_lot)
+                            print("exit right")
+                            print(parking_lot)
+                            parking_lot[c][r] = True
+                            parking_lot[c+1][r] = False
+                            print(parking_lot)
+                    #down
+                    if r < self.num_rows - 1: 
+                        if not parking_lot[c][r+1]:
+                            print("down")
+                            print(parking_lot)
+                            parking_lot[c][r] = False
+                            parking_lot[c][r+1] = True
+                            if c == col and r == row:
+                                self.pathfindToDepot(col, row+1, history, parking_lot)
+                            else:
+                                self.pathfindToDepot(col, row, history, parking_lot)
+                            print("exit down")
+                            print(parking_lot)
+                            parking_lot[c][r] = True
+                            parking_lot[c][r+1] = False
+                            print(parking_lot)
+                r += 1
+            c += 1
     
     def mapParkingLot(self):
         parking_lot = []
