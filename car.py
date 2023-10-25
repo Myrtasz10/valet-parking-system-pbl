@@ -7,7 +7,7 @@ from parking_space import ParkingSpace, ParkingSpaceSingleton
 class Car(QGraphicsRectItem):
     settingDestinationSignal = pyqtSignal(object) 
 
-    def __init__(self, col, row, width, height, speed):
+    def __init__(self, col, row, width, height, speed, containing_parking_lot):
         self.parking_space_width = width + 10
         self.parking_space_height = height + 10
 
@@ -19,19 +19,21 @@ class Car(QGraphicsRectItem):
 
         super().__init__(start_x, start_y, width, height)
 
-        singleton = ParkingSpaceSingleton()
-        self.parking_spaces = singleton.parking_spaces
+        self.singleton = ParkingSpaceSingleton()
+        self.parking_spaces = self.singleton.parking_spaces
 
-        self.setBrush(QColor('#ff0000'))
+        self.setBrush(QColor('#0000ff'))
         self.setAcceptHoverEvents(True)
         self.speed = speed
+        
+        self.parking_lot = containing_parking_lot
 
 
     def hoverEnterEvent(self, event):
-        self.setBrush(QColor('#cc0000'))
+        self.setBrush(QColor('#0000cc'))
 
     def hoverLeaveEvent(self, event):
-        self.setBrush(QColor('#ff0000'))
+        self.setBrush(QColor('#0000ff'))
 
     def contextMenuEvent(self, event):
         contextMenu = QMenu()
@@ -41,11 +43,13 @@ class Car(QGraphicsRectItem):
         moveDown = QAction('↓', moveMenu)
         moveLeft = QAction('←', moveMenu)
         moveRight = QAction('→', moveMenu)
+        moveToDepot = QAction('Move to depot', contextMenu)
         
         moveUp.triggered.connect(self.move_up)
         moveDown.triggered.connect(self.move_down)
         moveLeft.triggered.connect(self.move_left)
         moveRight.triggered.connect(self.move_right)
+        moveToDepot.triggered.connect(self.move_to_depot)
         
         moveMenu.addAction(moveUp)
         moveMenu.addAction(moveDown)
@@ -53,6 +57,7 @@ class Car(QGraphicsRectItem):
         moveMenu.addAction(moveRight)
         
         contextMenu.addMenu(moveMenu)
+        contextMenu.addAction(moveToDepot)
         
         # setDestination = QAction('Set Destination')
         # setDestination.triggered.connect(self.activateSetDestination)
@@ -162,3 +167,11 @@ class Car(QGraphicsRectItem):
         
         self.parking_spaces[start_space[0]][start_space[1]].occupied = False 
         self.parking_spaces[end_space[0]][end_space[1]].occupied = True 
+        
+    def move_to_depot(self):
+        for parking_column in self.parking_spaces:
+            for parking_space in parking_column:
+                print(parking_space.occupied)
+        self.parking_lot.moveCarToDepot(self.col, self.row)
+        
+        

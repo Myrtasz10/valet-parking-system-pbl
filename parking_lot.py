@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene,
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QContextMenuEvent
 from random import randint
+import numpy
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 
@@ -64,10 +65,29 @@ class ParkingLot(QWidget):
         if self.parking_spaces[col][row].occupied:
             return
 
-        car = Car(col, row, self.parking_width - 10, self.parking_height - 10, self.parser.speed)
+        car = Car(col, row, self.parking_width - 10, self.parking_height - 10, self.parser.speed, self)
         self.cars.append(car)
         self.scene.addItem(car)
 
         self.parking_spaces[col][row].occupied = True 
+    
+        
+    def moveCarToDepot(self, col, row):
+        parking_lot = numpy.zeros((self.num_rows, self.num_cols))
+        for parking_column in self.parking_lot:
+            for parking_space in parking_column:
+                if parking_space is True:
+                    
+    
+    def mapParkingLot(self):
+        parking_lot = []
+        for parking_column in self.parking_spaces:
+            column = []
+            for parking_space in parking_column:
+                print(parking_space.occupied)
+                column.append(parking_space.occupied)
+            parking_lot.append(column)
+        return parking_lot
+
 
         
