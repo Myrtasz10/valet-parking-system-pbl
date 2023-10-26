@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction
 from PyQt5.QtCore import QVariantAnimation, QPointF, QPoint
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 
 class Car(QGraphicsRectItem):
@@ -87,6 +87,20 @@ class Car(QGraphicsRectItem):
         self.animation.setEndValue(QPointF(end_x, end_y))
         self.animation.valueChanged.connect(self.setPos)
         self.animation.start()
+        
+        #await for animation to finish
+        loop = QEventLoop()
+
+        def animation_finished():
+            loop.quit()
+
+        self.animation.finished.connect(animation_finished)
+
+        # Start the animation
+        self.animation.start()
+
+        # Wait for the animation to finish
+        loop.exec_()
 
     def move_up(self):
         start_space = (self.col, self.row)
@@ -173,5 +187,6 @@ class Car(QGraphicsRectItem):
             for parking_space in parking_column:
                 print(parking_space.occupied)
         self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
+        self.parking_lot.animateToDepot()
         
         
