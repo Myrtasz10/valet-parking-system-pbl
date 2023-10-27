@@ -11,7 +11,7 @@ class Parser:
         layout = QVBoxLayout()
         
         self.parking_spots_rows_input = QLineEdit("3")
-        self.parking_spots_cols_input = QLineEdit("5")
+        self.parking_spots_cols_input = QLineEdit("4")
         self.agv_shuttles_input = QLineEdit("1")
         self.depots_input = QLineEdit("1")
         self.parking_spot_width_input = QLineEdit("1")

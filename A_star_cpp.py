@@ -19,7 +19,7 @@ def move_car_to_destination_cpp(parking_spaces, destination, id):
 
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Elapsed time for Python version: {elapsed_time} seconds")
+    print(f"Elapsed time for Cpp version: {elapsed_time} seconds")
 
     for move in moves:
         direction, (src_x, src_y), (dest_x, dest_y) = move
