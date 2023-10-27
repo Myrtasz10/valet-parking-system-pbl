@@ -1,13 +1,16 @@
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction, QInputDialog
 from PyQt5.QtCore import QVariantAnimation, QPointF, QPoint
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop, Qt
 from parking_space import ParkingSpace, ParkingSpaceSingleton
+from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen
 
 class Car(QGraphicsRectItem):
     settingDestinationSignal = pyqtSignal(object) 
 
-    def __init__(self, col, row, width, height, speed):
+    next_id = 0
+
+    def __init__(self, col, row, width, height, speed, containing_parking_lot):
         self.parking_space_width = width + 10
         self.parking_space_height = height + 10
 
@@ -19,19 +22,28 @@ class Car(QGraphicsRectItem):
 
         super().__init__(start_x, start_y, width, height)
 
-        singleton = ParkingSpaceSingleton()
-        self.parking_spaces = singleton.parking_spaces
+        self.singleton = ParkingSpaceSingleton()
+        self.parking_spaces = self.singleton.parking_spaces
 
-        self.setBrush(QColor('#ff0000'))
+        self.setBrush(QColor('#0000ff'))
         self.setAcceptHoverEvents(True)
         self.speed = speed
+        
+        self.parking_lot = containing_parking_lot
+        self.id = Car.next_id
+        Car.next_id += 1
+
+    def paint(self, painter, option, widget):
+        super().paint(painter, option, widget)
+        painter.setPen(QPen(QColor('white')))  # Set the pen color to white
+        painter.drawText(self.rect(), Qt.AlignCenter, str(self.id))
 
 
     def hoverEnterEvent(self, event):
-        self.setBrush(QColor('#cc0000'))
+        self.setBrush(QColor('#0000cc'))
 
     def hoverLeaveEvent(self, event):
-        self.setBrush(QColor('#ff0000'))
+        self.setBrush(QColor('#0000ff'))
 
     def contextMenuEvent(self, event):
         contextMenu = QMenu()
@@ -41,11 +53,13 @@ class Car(QGraphicsRectItem):
         moveDown = QAction('↓', moveMenu)
         moveLeft = QAction('←', moveMenu)
         moveRight = QAction('→', moveMenu)
+        moveToDepot = QAction('Move to depot', contextMenu)
         
         moveUp.triggered.connect(self.move_up)
         moveDown.triggered.connect(self.move_down)
         moveLeft.triggered.connect(self.move_left)
         moveRight.triggered.connect(self.move_right)
+        moveToDepot.triggered.connect(self.move_to_depot)
         
         moveMenu.addAction(moveUp)
         moveMenu.addAction(moveDown)
@@ -53,6 +67,7 @@ class Car(QGraphicsRectItem):
         moveMenu.addAction(moveRight)
         
         contextMenu.addMenu(moveMenu)
+        contextMenu.addAction(moveToDepot)
         
         # goToDestination = QAction('Go to Destination')
         # goToDestination.triggered.connect(self.go_to_destination)
@@ -82,15 +97,31 @@ class Car(QGraphicsRectItem):
         self.animation.setEndValue(QPointF(end_x, end_y))
         self.animation.valueChanged.connect(self.setPos)
         self.animation.start()
+        
+        #await for animation to finish
+        loop = QEventLoop()
+
+        def animation_finished():
+            loop.quit()
+
+        self.animation.finished.connect(animation_finished)
+
+        # Start the animation
+        self.animation.start()
+
+        # Wait for the animation to finish
+        loop.exec_()
 
     def move_up(self):
         start_space = (self.col, self.row)
         end_space = (self.col, self.row - 1)
         distance = self.parking_space_height / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
-
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
         self.animate(start_space, 
                      end_space, 
                      self.parking_space_width,
@@ -107,10 +138,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col, self.row + 1)
         distance = self.parking_space_height / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
-
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
 
         self.animate(start_space, 
                      end_space, 
@@ -128,10 +161,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col - 1, self.row)
         distance = self.parking_space_width / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
-
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
 
         self.animate(start_space, 
                      end_space, 
@@ -149,9 +184,12 @@ class Car(QGraphicsRectItem):
         start_space = (self.col, self.row)
         end_space = (self.col + 1, self.row)
         distance = self.parking_space_width / 50
-
-        if self.parking_spaces[end_space[0]][end_space[1]].occupied:
-            return 
+        try:
+            if self.parking_spaces[end_space[0]][end_space[1]].occupied:
+                return 
+        except IndexError:
+            print("Can't move past the parking lot")
+            return
 
 
         self.animate(start_space, 
@@ -177,3 +215,12 @@ class Car(QGraphicsRectItem):
             
     #         result = move_car_to_destination(self.parking_spaces, car_space, destination)
     #         print(result)  # Or handle the result in some other way
+        
+    def move_to_depot(self):
+        for parking_column in self.parking_spaces:
+            for parking_space in parking_column:
+                print(parking_space.occupied)
+        self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
+        self.parking_lot.animateToDepot()
+        
+        
