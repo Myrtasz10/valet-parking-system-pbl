@@ -5,6 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop, Qt
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen
 from A_star import move_car_to_destination
+from A_star_cpp import move_car_to_destination_cpp
 
 class Car(QGraphicsRectItem):
     settingDestinationSignal = pyqtSignal(object) 
@@ -56,6 +57,7 @@ class Car(QGraphicsRectItem):
         moveRight = QAction('→', moveMenu)
         moveToDepot = QAction('Move to depot', contextMenu)
         moveToDestination = QAction('Move to Destination with A*', contextMenu)
+        moveToDestinationCpp = QAction('Move to Destination with A* c++', contextMenu)
         
         moveUp.triggered.connect(self.move_up)
         moveDown.triggered.connect(self.move_down)
@@ -63,6 +65,7 @@ class Car(QGraphicsRectItem):
         moveRight.triggered.connect(self.move_right)
         moveToDepot.triggered.connect(self.move_to_depot)
         moveToDestination.triggered.connect(self.move_to_destination)
+        moveToDestinationCpp.triggered.connect(self.move_to_destination_cpp)
         
         moveMenu.addAction(moveUp)
         moveMenu.addAction(moveDown)
@@ -72,6 +75,7 @@ class Car(QGraphicsRectItem):
         contextMenu.addMenu(moveMenu)
         contextMenu.addAction(moveToDepot)
         contextMenu.addAction(moveToDestination)
+        contextMenu.addAction(moveToDestinationCpp)
         
         contextMenu.exec_(event.screenPos())
 
@@ -211,10 +215,21 @@ class Car(QGraphicsRectItem):
 
         if ok1 and ok2:
             destination = (col, row)
-            # car_space = (self.col, self.row)
             
             result = move_car_to_destination(self.parking_spaces, destination, self.id)
-            print(result)  # Or handle the result in some other way
+            print(result)
+
+    def move_to_destination_cpp(self):
+        col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
+        row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+
+        if ok1 and ok2:
+            destination = (col, row)
+            
+            result = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
+            print(result)
+
+
         
     def move_to_depot(self):
         for parking_column in self.parking_spaces:

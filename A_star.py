@@ -11,7 +11,13 @@ def move_car_to_destination(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids(parking_spaces)
     target_car_id = id
 
+    start_time = time.time()
+
     moves = a_star_parking(start_state, target_car_id, destination)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time for Python version: {elapsed_time} seconds")
 
     for move in moves:
         direction, (src_x, src_y), (dest_x, dest_y) = move
