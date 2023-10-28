@@ -93,4 +93,6 @@ PYBIND11_MODULE(a_star_parking_module, m) {
 //g++ -O3 -Wall -shared -std=c++2a -fPIC $(python3 -m pybind11 --includes) a_star.cpp -o a_star_parking_module$(`python3 -config --extension-suffix`)
 
 //windows:
-//g++ -O3 -Wall -shared -std=c++2a -fPIC -IC:\Users\user\AppData\Local\Programs\Python\Python310\Lib\site-packages\pybind11\include -IC:\Users\user\AppData\Local\Programs\Python\Python310\include a_star.cpp -o a_star_parking_module
+//g++ -O3 -Wall -shared -std=c++2a -IC:\Users\krzys\AppData\Local\Programs\Python\Python310\include -IC:\Users\krzys\AppData\Local\Programs\Python\Python310\Lib\site-packages\pybind11\include a_star.cpp -L C:\Users\krzys\AppData\Local\Programs\Python\Python310\libs -lpython310 -o a_star_parking_module.dll
+
+//g++ -O3 -Wall -shared -std=c++2a -fPIC -IC:\Users\krzys\AppData\Local\Programs\Python\Python310\Include -IC:\Users\krzys\AppData\Local\Programs\Python\Python310\lib\site-packages\pybind11\include a_star.cpp -o a_star_parking_module.pyd "-Wl,--export-all-symbols" -LC:\Users\krzys\AppData\Local\Programs\Python\Python310\libs -lpython310

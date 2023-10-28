@@ -1,5 +1,19 @@
 import time
-from cpp import a_star_parking_module
+import os
+import sys
+
+sys.path.append('./cpp')  # Ensure the cpp directory is in the PYTHONPATH
+
+if os.name == 'posix':
+    from cpp import a_star_parking_module  # Import the Linux version
+elif os.name == 'nt':
+    # from cpp import a_star_parking_module  # Import the Windows version
+    pass
+    # import ctypes
+    # ctypes.CDLL("a_star_parking_module.pyd")
+else:
+    raise EnvironmentError("Unsupported OS")
+
 
 def parking_spaces_to_ids_for_cpp(parking_spaces):
     return [
