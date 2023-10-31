@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction, QInputDialog
 from PyQt5.QtCore import QVariantAnimation, QPointF, QPoint
 from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop, Qt
 from parking_space import ParkingSpace, ParkingSpaceSingleton
-from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen
+from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen, QFontMetrics
 from A_star import move_car_to_destination
 from A_star_cpp import move_car_to_destination_cpp
 
@@ -37,9 +37,30 @@ class Car(QGraphicsRectItem):
 
     def paint(self, painter, option, widget):
         super().paint(painter, option, widget)
-        painter.setPen(QPen(QColor('white')))  # Set the pen color to white
-        painter.drawText(self.rect(), Qt.AlignCenter, str(self.id))
-
+        
+        # Initialize a QFont object for the painter
+        font = QFont()
+        text = str(self.id)
+        rect = self.rect()
+        max_height = rect.height() / 2  # Maximum height for the text
+        
+        # Start with a reasonably large font size for initial metrics
+        font_size = 100
+        font.setPointSize(font_size)
+        painter.setFont(font)
+        fm = QFontMetrics(font)
+        
+        # Decrease the font size until the text height is half the rect height or less
+        while fm.height() > max_height:
+            # Decrease font size
+            font_size -= 1
+            font.setPointSize(font_size)
+            painter.setFont(font)
+            fm = QFontMetrics(font)
+        
+        # Set the pen and draw the text
+        painter.setPen(QPen(QColor('white')))
+        painter.drawText(rect, Qt.AlignCenter, text)
 
     def hoverEnterEvent(self, event):
         self.setBrush(QColor('#0000cc'))
