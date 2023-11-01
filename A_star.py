@@ -33,9 +33,39 @@ def move_car_to_destination(parking_spaces, destination, id):
 
     return moves
 
+def free_up_space(parking_spaces, target_coords):
+    start_state = parking_spaces_to_ids(parking_spaces)
+
+    start_time = time.time()
+
+    moves = a_star_parking(start_state, None, target_coords, is_final_state_func=is_space_free)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time for freeing up space: {elapsed_time} seconds")
+
+    for move in moves:
+        direction, (src_x, src_y), (dest_x, dest_y) = move
+
+        if direction == 'right':
+            parking_spaces[src_x][src_y].car.move_right()
+        elif direction == 'up':
+            parking_spaces[src_x][src_y].car.move_up()
+        elif direction == 'left':
+            parking_spaces[src_x][src_y].car.move_left()
+        elif direction == 'down':
+            parking_spaces[src_x][src_y].car.move_down()
+
+    return moves
+
+
 def is_final_parking_state(state, car_id, dest_coords):
     x, y = dest_coords
     return state[x][y] is not None and state[x][y] == car_id
+
+def is_space_free(state, _, dest_coords):
+    x, y = dest_coords
+    return state[x][y] is None
 
 def create_all_parking_neighbors_states(state):
     neighbors = []
@@ -50,7 +80,7 @@ def create_all_parking_neighbors_states(state):
                         neighbors.append((new_state, move, (x, y), (new_x, new_y)))
     return neighbors
 
-def a_star_parking(start_state, car_id, dest_coords):
+def a_star_parking(start_state, car_id, dest_coords, is_final_state_func=is_final_parking_state):
     open_list = [(start_state, [], 0)]
     closed_list = []
 
@@ -59,7 +89,7 @@ def a_star_parking(start_state, car_id, dest_coords):
         current_state, current_moves, current_g = open_list.pop(0)
         closed_list.append(current_state)
 
-        if is_final_parking_state(current_state, car_id, dest_coords):
+        if is_final_state_func(current_state, car_id, dest_coords):
             return current_moves
 
         for neighbor, move_direction, src_coords, new_coords in create_all_parking_neighbors_states(current_state):

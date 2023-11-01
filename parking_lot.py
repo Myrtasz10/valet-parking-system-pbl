@@ -4,8 +4,11 @@ from PyQt5.QtGui import QContextMenuEvent
 from random import randint
 import copy
 import time
+from PyQt5.QtWidgets import QMessageBox
+
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
+from A_star import free_up_space
 
 class ParkingLot(QWidget):
     def __init__(self, parser):
@@ -47,6 +50,12 @@ class ParkingLot(QWidget):
         addCar = QAction('Add Car', self)
         addCar.triggered.connect(lambda: self.addCar(pos))
         contextMenu.addAction(addCar)
+        
+        # New action for freeing up space
+        freeSpace = QAction('Free Up Space', self)
+        freeSpace.triggered.connect(lambda: self.freeSpace(pos))
+        contextMenu.addAction(freeSpace)
+        
         contextMenu.exec_(event.globalPos())
 
     def addGrid(self):
@@ -75,6 +84,19 @@ class ParkingLot(QWidget):
         self.parking_spaces[col][row].car = car
         self.parking_spaces[col][row].occupied = True
         self.parking_spaces[col][row].occupied = True 
+
+
+    def freeSpace(self, position):
+        col = int((position.x() - self.parking_width / 2) // self.parking_width)
+        row = int((position.y() - self.parking_height / 2) // self.parking_height)
+
+        if not self.parking_spaces[col][row].occupied:
+            QMessageBox.information(self, "Info", "This space is already free.")
+            return
+
+        # Assuming move_car_to_destination frees up the space at (col, row)
+        free_up_space(self.parking_spaces, (col, row))
+
         
     #Dijkstra
     #self; desired vehicle column; row; parking lot history in Dijkstra; parking lot

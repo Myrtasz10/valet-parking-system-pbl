@@ -7,10 +7,15 @@ sys.path.append('./cpp')  # Ensure the cpp directory is in the PYTHONPATH
 if os.name == 'posix':
     from cpp import a_star_parking_module  # Import the Linux version
 elif os.name == 'nt':
-    # from cpp import a_star_parking_module  # Import the Windows version
-    pass
+    # from cpp import a_star as  a_star_parking_module# Import the Windows version
     # import ctypes
-    # ctypes.CDLL("a_star_parking_module.pyd")
+    # ctypes.CDLL("a_star.dll")
+    # import ctypes
+
+    # current_directory = os.getcwd()  # This gets the current directory where your script is running
+    # dll_path = os.path.join(current_directory, 'cpp', 'a_start.pyd')  # This constructs the full path to the DLL
+    # ctypes.CDLL(dll_path)
+    pass
 else:
     raise EnvironmentError("Unsupported OS")
 
