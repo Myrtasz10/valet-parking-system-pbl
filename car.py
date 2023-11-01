@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop, Qt
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen, QFontMetrics
 from A_star import move_car_to_destination
-from A_star_cpp import move_car_to_destination_cpp
+from A_star_libs import move_car_to_destination_cpp, move_car_to_destination_rust
 
 class Car(QGraphicsRectItem):
     settingDestinationSignal = pyqtSignal(object) 
@@ -79,6 +79,7 @@ class Car(QGraphicsRectItem):
         moveToDepot = QAction('Move to depot', contextMenu)
         moveToDestination = QAction('Move to Destination with A*', contextMenu)
         moveToDestinationCpp = QAction('Move to Destination with A* c++', contextMenu)
+        moveToDestinationRust = QAction('Move to Destination with A* Rust', contextMenu)
         
         moveUp.triggered.connect(self.move_up)
         moveDown.triggered.connect(self.move_down)
@@ -87,6 +88,7 @@ class Car(QGraphicsRectItem):
         moveToDepot.triggered.connect(self.move_to_depot)
         moveToDestination.triggered.connect(self.move_to_destination)
         moveToDestinationCpp.triggered.connect(self.move_to_destination_cpp)
+        moveToDestinationRust.triggered.connect(self.move_to_destination_rust)
         
         moveMenu.addAction(moveUp)
         moveMenu.addAction(moveDown)
@@ -97,6 +99,7 @@ class Car(QGraphicsRectItem):
         contextMenu.addAction(moveToDepot)
         contextMenu.addAction(moveToDestination)
         contextMenu.addAction(moveToDestinationCpp)
+        contextMenu.addAction(moveToDestinationRust)
         
         contextMenu.exec_(event.screenPos())
 
@@ -248,6 +251,17 @@ class Car(QGraphicsRectItem):
             destination = (col, row)
             
             result = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
+            print(result)
+
+    
+    def move_to_destination_rust(self):
+        col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
+        row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+
+        if ok1 and ok2:
+            destination = (col, row)
+            
+            result = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
             print(result)
 
 

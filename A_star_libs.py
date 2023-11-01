@@ -5,16 +5,11 @@ import sys
 sys.path.append('./cpp')  # Ensure the cpp directory is in the PYTHONPATH
 
 if os.name == 'posix':
-    from cpp import a_star_parking_module  # Import the Linux version
+    #linux
+    from cpp import a_star_parking_module
+    from rust import a_star_parking_module_rust
 elif os.name == 'nt':
-    # from cpp import a_star as  a_star_parking_module# Import the Windows version
-    # import ctypes
-    # ctypes.CDLL("a_star.dll")
-    # import ctypes
-
-    # current_directory = os.getcwd()  # This gets the current directory where your script is running
-    # dll_path = os.path.join(current_directory, 'cpp', 'a_start.pyd')  # This constructs the full path to the DLL
-    # ctypes.CDLL(dll_path)
+    #windows
     pass
 else:
     raise EnvironmentError("Unsupported OS")
@@ -39,6 +34,34 @@ def move_car_to_destination_cpp(parking_spaces, destination, id):
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Elapsed time for Cpp version: {elapsed_time} seconds")
+
+    for move in moves:
+        direction, (src_x, src_y), (dest_x, dest_y) = move
+
+        if direction == 'right':
+            parking_spaces[src_x][src_y].car.move_right()
+        elif direction == 'up':
+            parking_spaces[src_x][src_y].car.move_up()
+        elif direction == 'left':
+            parking_spaces[src_x][src_y].car.move_left()
+        elif direction == 'down':
+            parking_spaces[src_x][src_y].car.move_down()
+
+    return moves
+
+
+def move_car_to_destination_rust(parking_spaces, destination, id):
+    start_state = parking_spaces_to_ids_for_cpp(parking_spaces)
+    target_car_id = id
+    
+    start_time = time.time()
+
+    # Call the a_star_parking function from your Rust module
+    moves = a_star_parking_module_rust.a_star_parking_py(start_state, target_car_id, destination)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time for Rust version: {elapsed_time} seconds")
 
     for move in moves:
         direction, (src_x, src_y), (dest_x, dest_y) = move
