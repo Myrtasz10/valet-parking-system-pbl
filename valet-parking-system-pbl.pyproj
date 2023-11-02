@@ -19,6 +19,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="A_star.py" />
     <Compile Include="car.py" />
     <Compile Include="env\Lib\site-packages\pip\_vendor\urllib3\packages\backports\makefile.py" />
     <Compile Include="env\Lib\site-packages\pip\_vendor\urllib3\packages\backports\weakref_finalize.py" />
@@ -31,6 +32,7 @@
     <Compile Include="parking_space.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="cpp\" />
     <Folder Include="env\" />
     <Folder Include="env\Lib\" />
     <Folder Include="env\Lib\site-packages\" />
@@ -39,6 +41,18 @@
     <Folder Include="env\Lib\site-packages\pip\_vendor\urllib3\" />
     <Folder Include="env\Lib\site-packages\pip\_vendor\urllib3\packages" />
     <Folder Include="env\Lib\site-packages\pip\_vendor\urllib3\packages\backports" />
+    <Folder Include="rust\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="cpp\a_star.cpp" />
+    <Content Include="cpp\a_star.dll" />
+    <Content Include="cpp\a_start.pyd" />
+    <Content Include="cpp\a_star_parking_module.cpython-310-x86_64-linux-gnu.so" />
+    <Content Include="cpp\a_star_parking_module.dll" />
+    <Content Include="cpp\a_star_parking_module.pyd" />
+    <Content Include="cpp\a_star_parking_module.so" />
+    <Content Include="rust\a_star_parking_module_rust.so" />
+    <Content Include="rust\lib.rs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

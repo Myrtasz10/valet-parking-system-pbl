@@ -207,6 +207,9 @@ class ParkingLot(QWidget):
 
     def animateToDepot(self):
         print(self.histories)
+        if(self.histories.count == 0):
+            print("No path was found")
+            return
         shortest_path = min(self.histories, key = len)
         print("The shortest path:", shortest_path)
         print("The cars:", self.cars)
@@ -241,7 +244,7 @@ class ParkingLot(QWidget):
                         #    print(state[c-1][r])
                         #    print(shortest_path[s+1][c-1][r])
                         
-                        elif not r > 0 and state[c][r-1] and shortest_path[s+1][c][r-1]:
+                        elif r > 0 and not state[c][r-1] and shortest_path[s+1][c][r-1]:
                             print("Up moving")
                             for car_number in range(len(self.cars)):
                                 if self.cars[car_number].col == c and self.cars[car_number].row == r:
