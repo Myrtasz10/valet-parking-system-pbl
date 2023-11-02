@@ -63,7 +63,7 @@ class Car(QGraphicsRectItem):
         painter.drawText(rect, Qt.AlignCenter, text)
 
     def hoverEnterEvent(self, event):
-        self.setBrush(QColor('#0000cc'))
+        self.setBrush(QColor('#0000aa'))
 
     def hoverLeaveEvent(self, event):
         self.setBrush(QColor('#0000ff'))
@@ -237,15 +237,21 @@ class Car(QGraphicsRectItem):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
 
+        self.setBrush(QColor('#ff11aa'))
+
         if ok1 and ok2:
             destination = (col, row)
             
             result = move_car_to_destination(self.parking_spaces, destination, self.id)
             print(result)
 
+        self.setBrush(QColor('#0000ff'))
+
     def move_to_destination_cpp(self):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+
+        self.setBrush(QColor('#ff11aa'))
 
         if ok1 and ok2:
             destination = (col, row)
@@ -253,16 +259,22 @@ class Car(QGraphicsRectItem):
             result = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
             print(result)
 
+        self.setBrush(QColor('#0000ff'))
+
     
     def move_to_destination_rust(self):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+
+        self.setBrush(QColor('#ff11aa'))
 
         if ok1 and ok2:
             destination = (col, row)
             
             result = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
             print(result)
+
+        self.setBrush(QColor('#0000ff'))
 
 
         
