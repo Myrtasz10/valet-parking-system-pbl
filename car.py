@@ -76,8 +76,8 @@ class Car(QGraphicsRectItem):
         moveDown = QAction('↓', moveMenu)
         moveLeft = QAction('←', moveMenu)
         moveRight = QAction('→', moveMenu)
-        moveToDepot = QAction('Move to depot', contextMenu)
-        moveToDestination = QAction('Move to Destination with A*', contextMenu)
+        moveToDepot = QAction("Move to depot Dijkstra's Python", contextMenu)
+        moveToDestination = QAction('Move to Destination with A* Python', contextMenu)
         moveToDestinationCpp = QAction('Move to Destination with A* c++', contextMenu)
         moveToDestinationRust = QAction('Move to Destination with A* Rust', contextMenu)
         
