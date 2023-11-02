@@ -27,13 +27,15 @@ class Car(QGraphicsRectItem):
         self.singleton = ParkingSpaceSingleton()
         self.parking_spaces = self.singleton.parking_spaces
 
-        self.setBrush(QColor('#0000ff'))
+        self.setBrush(QColor('#000066'))
         self.setAcceptHoverEvents(True)
         self.speed = speed
         
         self.parking_lot = containing_parking_lot
         self.id = Car.next_id
         Car.next_id += 1
+
+        self.is_moving = False
 
     def paint(self, painter, option, widget):
         super().paint(painter, option, widget)
@@ -63,10 +65,12 @@ class Car(QGraphicsRectItem):
         painter.drawText(rect, Qt.AlignCenter, text)
 
     def hoverEnterEvent(self, event):
-        self.setBrush(QColor('#0000aa'))
+        if not self.is_moving:
+            self.setBrush(QColor('#0000aa'))
 
     def hoverLeaveEvent(self, event):
-        self.setBrush(QColor('#0000ff'))
+        if not self.is_moving:
+            self.setBrush(QColor('#000066'))
 
     def contextMenuEvent(self, event):
         contextMenu = QMenu()
@@ -237,7 +241,8 @@ class Car(QGraphicsRectItem):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
 
-        self.setBrush(QColor('#ff11aa'))
+        self.is_moving = True
+        self.setBrush(QColor('#ff0000'))
 
         if ok1 and ok2:
             destination = (col, row)
@@ -245,13 +250,15 @@ class Car(QGraphicsRectItem):
             result = move_car_to_destination(self.parking_spaces, destination, self.id)
             print(result)
 
-        self.setBrush(QColor('#0000ff'))
+        self.setBrush(QColor('#000066'))
+        self.is_moving = False
 
     def move_to_destination_cpp(self):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
 
-        self.setBrush(QColor('#ff11aa'))
+        self.is_moving = True
+        self.setBrush(QColor('#ff0000'))
 
         if ok1 and ok2:
             destination = (col, row)
@@ -259,14 +266,16 @@ class Car(QGraphicsRectItem):
             result = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
             print(result)
 
-        self.setBrush(QColor('#0000ff'))
+        self.setBrush(QColor('#000066'))
+        self.is_moving = False
 
     
     def move_to_destination_rust(self):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
 
-        self.setBrush(QColor('#ff11aa'))
+        self.is_moving = True
+        self.setBrush(QColor('#ff0000'))
 
         if ok1 and ok2:
             destination = (col, row)
@@ -274,7 +283,8 @@ class Car(QGraphicsRectItem):
             result = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
             print(result)
 
-        self.setBrush(QColor('#0000ff'))
+        self.setBrush(QColor('#000066'))
+        self.is_moving = False
 
 
         
