@@ -10,12 +10,23 @@ class ParkingSpace(QGraphicsRectItem):
         self.setAcceptHoverEvents(True)
         self.occupied = False
         self.car = None 
+        self.is_destination = False
 
     def hoverEnterEvent(self, event):
-        self.setPen(QPen(QColor('#333333'), 2))
+        if not self.is_destination:
+            self.setPen(QPen(QColor('#000000'), 2))
 
     def hoverLeaveEvent(self, event):
-        self.setPen(QPen(QColor('#000000'), 1))
+        if not self.is_destination:
+            self.setPen(QPen(QColor('#333333'), 1))
+
+    def setAsDestination(self):
+        self.is_destination = True
+        self.setPen(QPen(QColor('#ff0000'), 4))
+
+    def removeAsDestination(self):
+        self.is_destination = False
+        self.setPen(QPen(QColor('#333333'), 1))
 
 class ParkingSpaceSingleton:
     _instance = None

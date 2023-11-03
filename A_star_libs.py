@@ -26,6 +26,8 @@ def move_car_to_destination_cpp(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids_for_cpp(parking_spaces)
     target_car_id = id
     
+    parking_spaces[destination[0]][destination[1]].setAsDestination()
+
     start_time = time.time()
 
     # Call the a_star_parking function from your C++ module
@@ -47,6 +49,8 @@ def move_car_to_destination_cpp(parking_spaces, destination, id):
         elif direction == 'down':
             parking_spaces[src_x][src_y].car.move_down()
 
+    parking_spaces[destination[0]][destination[1]].removeAsDestination()
+
     return moves
 
 
@@ -54,6 +58,8 @@ def move_car_to_destination_rust(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids_for_cpp(parking_spaces)
     target_car_id = id
     
+    parking_spaces[destination[0]][destination[1]].setAsDestination()
+
     start_time = time.time()
 
     # Call the a_star_parking function from your Rust module
@@ -74,5 +80,7 @@ def move_car_to_destination_rust(parking_spaces, destination, id):
             parking_spaces[src_x][src_y].car.move_left()
         elif direction == 'down':
             parking_spaces[src_x][src_y].car.move_down()
+
+    parking_spaces[destination[0]][destination[1]].removeAsDestination()
 
     return moves

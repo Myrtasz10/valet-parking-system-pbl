@@ -11,6 +11,8 @@ def move_car_to_destination(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids(parking_spaces)
     target_car_id = id
 
+    parking_spaces[destination[0]][destination[1]].setAsDestination()
+
     start_time = time.time()
 
     moves = a_star_parking(start_state, target_car_id, destination)
@@ -30,6 +32,8 @@ def move_car_to_destination(parking_spaces, destination, id):
             parking_spaces[src_x][src_y].car.move_left()
         elif direction == 'down':
             parking_spaces[src_x][src_y].car.move_down()
+
+    parking_spaces[destination[0]][destination[1]].removeAsDestination()
 
     return moves
 
