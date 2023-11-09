@@ -26,8 +26,8 @@ class ParkingLot(QWidget):
         self.parking_height = int(parser.parking_spot_height) * 50
         self.num_rows = int(parser.parking_spots_rows)
         self.num_cols = int(parser.parking_spots_cols)
-        self.initUI()
         self.depot_coords = (0, 0)
+        self.initUI()
 
     def initUI(self):
         self.layout = QVBoxLayout()
@@ -39,6 +39,10 @@ class ParkingLot(QWidget):
         self.addGrid()
         self.addButton = QPushButton('Add Car at Depot', self)
         self.addButton.clicked.connect(self.addCarAtDepot)
+        self.layout.addWidget(self.addButton)
+
+        self.addButton = QPushButton('Remove Car from Depot', self)
+        self.addButton.clicked.connect(self.removeCarFromDetpot)
         self.layout.addWidget(self.addButton)
 
 
@@ -76,6 +80,17 @@ class ParkingLot(QWidget):
         self.parking_spaces[col][row].car = car
         self.parking_spaces[col][row].occupied = True
 
+    def removeCarFromDetpot(self):
+        col, row = self.depot_coords
+
+        if not self.parking_spaces[col][row].occupied:
+            message = f"There is no car at depot"
+            QMessageBox.information(None, "Cannot remove car from depot", message)
+            return
+
+
+        self.parking_spaces[col][row].car.remove_car()
+
     def contextMenuEvent(self, event):
         pos = event.pos()
         contextMenu = QMenu(self)
@@ -100,6 +115,10 @@ class ParkingLot(QWidget):
                 col_spaces.append(parking_space)
                 self.scene.addItem(parking_space)
             self.parking_spaces.append(col_spaces)
+        
+        depot_col, depot_row = self.depot_coords
+
+        self.parking_spaces[depot_col][depot_row].setAsDepot()
 
 
     def addCar(self, position):

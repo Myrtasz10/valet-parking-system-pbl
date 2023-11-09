@@ -28,6 +28,14 @@ class ParkingSpace(QGraphicsRectItem):
         self.is_destination = False
         self.setPen(QPen(QColor('#333333'), 1))
 
+    def setAsDepot(self):
+        self.is_depot = True
+        self.setBrush(QColor('#aaffaa'))  # Set a distinct fill color for the depot
+
+    def unsetAsDepot(self):
+        self.is_depot = False
+        self.setBrush(Qt.NoBrush)  # Reset to no fill
+
 class ParkingSpaceSingleton:
     _instance = None
 
