@@ -24,7 +24,7 @@ class ParkingSpace(QGraphicsRectItem):
         self.is_destination = True
         self.setPen(QPen(QColor('#ff0000'), 4))
 
-    def removeAsDestination(self):
+    def unsetAsDestination(self):
         self.is_destination = False
         self.setPen(QPen(QColor('#333333'), 1))
 

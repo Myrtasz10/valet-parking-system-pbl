@@ -33,7 +33,7 @@ def move_car_to_destination(parking_spaces, destination, id):
         elif direction == 'down':
             parking_spaces[src_x][src_y].car.move_down()
 
-    parking_spaces[destination[0]][destination[1]].removeAsDestination()
+    parking_spaces[destination[0]][destination[1]].unsetAsDestination()
 
     return moves
 

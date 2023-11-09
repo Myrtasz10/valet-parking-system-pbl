@@ -14,8 +14,8 @@ class Parser:
         self.parking_spots_cols_input = QLineEdit("4")
         self.agv_shuttles_input = QLineEdit("1")
         self.depots_input = QLineEdit("1")
-        self.parking_spot_width_input = QLineEdit("1")
-        self.parking_spot_height_input = QLineEdit("2")
+        self.parking_spot_width_input = QLineEdit("2")
+        self.parking_spot_height_input = QLineEdit("3")
         self.speed_input = QLineEdit("4")
         
         self.submit_button = QPushButton('Submit')
