@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene, QMenu, QAction
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene, QMenu, QAction, QPushButton
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QContextMenuEvent
 from random import randint
@@ -27,6 +27,7 @@ class ParkingLot(QWidget):
         self.num_rows = int(parser.parking_spots_rows)
         self.num_cols = int(parser.parking_spots_cols)
         self.initUI()
+        self.depot_coords = (0, 0)
 
     def initUI(self):
         self.layout = QVBoxLayout()
@@ -36,6 +37,9 @@ class ParkingLot(QWidget):
         self.scene = QGraphicsScene(self)
         self.view.setScene(self.scene)
         self.addGrid()
+        self.addButton = QPushButton('Add Car at Depot', self)
+        self.addButton.clicked.connect(self.addCarAtDepot)
+        self.layout.addWidget(self.addButton)
 
 
         window_width = (self.num_cols + 1) * self.parking_width
@@ -43,6 +47,34 @@ class ParkingLot(QWidget):
 
         # Set the fixed window size
         self.setFixedSize(window_width, window_height)
+
+    def is_free_space(self):
+        free_space_count = 0  # Counter for unoccupied spaces
+        for col_spaces in self.parking_spaces:
+            for space in col_spaces:
+                if not space.occupied:
+                    free_space_count += 1
+                    if free_space_count >= 2:  # Check if at least two free spaces are found
+                        return True
+        return False  # Less than two free spaces available
+
+    def addCarAtDepot(self):
+        col, row = self.depot_coords
+
+        if not self.is_free_space():
+            message = f"There must be at least one free parking space!"
+            QMessageBox.information(None, "Cannot add car at depot", message)
+            return
+
+        if self.parking_spaces[col][row].occupied:
+            free_up_space(self.parking_spaces, (col, row))
+
+        car = Car(col, row, self.parking_width - 10, self.parking_height - 10, self.parser.speed, self)
+        self.cars.append(car)
+        self.scene.addItem(car)
+
+        self.parking_spaces[col][row].car = car
+        self.parking_spaces[col][row].occupied = True
 
     def contextMenuEvent(self, event):
         pos = event.pos()
@@ -53,7 +85,7 @@ class ParkingLot(QWidget):
         
         # New action for freeing up space
         freeSpace = QAction('Free Up Space', self)
-        freeSpace.triggered.connect(lambda: self.freeSpace(pos))
+        freeSpace.triggered.connect(lambda: self.freeUpSpace(pos))
         contextMenu.addAction(freeSpace)
         
         contextMenu.exec_(event.globalPos())
@@ -83,10 +115,9 @@ class ParkingLot(QWidget):
 
         self.parking_spaces[col][row].car = car
         self.parking_spaces[col][row].occupied = True
-        self.parking_spaces[col][row].occupied = True 
 
 
-    def freeSpace(self, position):
+    def freeUpSpace(self, position):
         col = int((position.x() - self.parking_width / 2) // self.parking_width)
         row = int((position.y() - self.parking_height / 2) // self.parking_height)
 
@@ -94,7 +125,6 @@ class ParkingLot(QWidget):
             QMessageBox.information(self, "Info", "This space is already free.")
             return
 
-        # Assuming move_car_to_destination frees up the space at (col, row)
         free_up_space(self.parking_spaces, (col, row))
 
         

@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction, QInputDialog
+from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction, QInputDialog, QMessageBox
 from PyQt5.QtCore import QVariantAnimation, QPointF, QPoint
 from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop, Qt
 from parking_space import ParkingSpace, ParkingSpaceSingleton
@@ -84,6 +84,7 @@ class Car(QGraphicsRectItem):
         moveToDestination = QAction('Move to Destination with A* Python', contextMenu)
         moveToDestinationCpp = QAction('Move to Destination with A* c++', contextMenu)
         moveToDestinationRust = QAction('Move to Destination with A* Rust', contextMenu)
+        removeCar = QAction('Remove Car', contextMenu)
         
         moveUp.triggered.connect(self.move_up)
         moveDown.triggered.connect(self.move_down)
@@ -93,6 +94,7 @@ class Car(QGraphicsRectItem):
         moveToDestination.triggered.connect(self.move_to_destination)
         moveToDestinationCpp.triggered.connect(self.move_to_destination_cpp)
         moveToDestinationRust.triggered.connect(self.move_to_destination_rust)
+        removeCar.triggered.connect(self.remove_car)
         
         moveMenu.addAction(moveUp)
         moveMenu.addAction(moveDown)
@@ -104,6 +106,8 @@ class Car(QGraphicsRectItem):
         contextMenu.addAction(moveToDestination)
         contextMenu.addAction(moveToDestinationCpp)
         contextMenu.addAction(moveToDestinationRust)
+
+        contextMenu.addAction(removeCar)
         
         contextMenu.exec_(event.screenPos())
 
@@ -246,9 +250,21 @@ class Car(QGraphicsRectItem):
 
         if ok1 and ok2:
             destination = (col, row)
+
+        else:
+            self.setBrush(QColor('#000066'))
+            self.is_moving = False
+            return
             
-            result = move_car_to_destination(self.parking_spaces, destination, self.id)
-            print(result)
+        moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination(self.parking_spaces, destination, self.id)
+        print(moves)
+
+        # Prepare the message to display
+        message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
+        
+        # Display the result in a pop-up message box
+        QMessageBox.information(None, "Movement Results", message)
+
 
         self.setBrush(QColor('#000066'))
         self.is_moving = False
@@ -262,9 +278,21 @@ class Car(QGraphicsRectItem):
 
         if ok1 and ok2:
             destination = (col, row)
+
+        else:
+            self.setBrush(QColor('#000066'))
+            self.is_moving = False
+            return
             
-            result = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
-            print(result)
+        moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
+        print(moves)
+
+        # Prepare the message to display
+        message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
+        
+        # Display the result in a pop-up message box
+        QMessageBox.information(None, "Movement Results", message)
+
 
         self.setBrush(QColor('#000066'))
         self.is_moving = False
@@ -279,9 +307,21 @@ class Car(QGraphicsRectItem):
 
         if ok1 and ok2:
             destination = (col, row)
+
+        else:
+            self.setBrush(QColor('#000066'))
+            self.is_moving = False
+            return
             
-            result = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
-            print(result)
+        moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
+        print(moves)
+
+        # Prepare the message to display
+        message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
+        
+        # Display the result in a pop-up message box
+        QMessageBox.information(None, "Movement Results", message)
+
 
         self.setBrush(QColor('#000066'))
         self.is_moving = False
@@ -296,3 +336,9 @@ class Car(QGraphicsRectItem):
         self.parking_lot.animateToDepot()
         
         
+    def remove_car(self):
+        # Directly remove this car instance from the scene
+        self.parking_lot.scene.removeItem(self)
+        # Update the parking space to mark it as unoccupied
+        self.parking_lot.parking_spaces[self.col][self.row].car = None
+        self.parking_lot.parking_spaces[self.col][self.row].occupied = False
