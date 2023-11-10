@@ -89,7 +89,15 @@ class ParkingLot(QWidget):
             return
 
 
-        self.parking_spaces[col][row].car.remove_car()
+        self.parking_spaces[col][row].car.remove()
+
+    def remove_car(self, car_id):
+        for col in self.parking_spaces:
+            for space in col:
+                if space.occupied and space.car.id == car_id:
+                    space.car.move_to_depot_rust()
+                    self.removeCarFromDetpot()
+                    return  # Stop after removing the car
 
     def contextMenuEvent(self, event):
         pos = event.pos()
