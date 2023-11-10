@@ -94,7 +94,7 @@ class Car(QGraphicsRectItem):
         moveToDestination.triggered.connect(self.move_to_destination)
         moveToDestinationCpp.triggered.connect(self.move_to_destination_cpp)
         moveToDestinationRust.triggered.connect(self.move_to_destination_rust)
-        removeCar.triggered.connect(self.remove_car)
+        removeCar.triggered.connect(self.remove)
         
         moveMenu.addAction(moveUp)
         moveMenu.addAction(moveDown)
@@ -327,6 +327,16 @@ class Car(QGraphicsRectItem):
         self.is_moving = False
 
 
+    def move_to_depot_rust(self):
+        self.is_moving = True
+        self.setBrush(QColor('#ff0000'))
+            
+        moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, (0, 0), self.id)
+        print(moves)
+
+        self.setBrush(QColor('#000066'))
+        self.is_moving = False
+
         
     def move_to_depot(self):
         for parking_column in self.parking_spaces:
@@ -336,7 +346,7 @@ class Car(QGraphicsRectItem):
         self.parking_lot.animateToDepot()
         
         
-    def remove_car(self):
+    def remove(self):
         # Directly remove this car instance from the scene
         self.parking_lot.scene.removeItem(self)
         # Update the parking space to mark it as unoccupied
