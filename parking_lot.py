@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene, QMenu, QAction, QPushButton
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene
+from PyQt5.QtWidgets import QFileDialog, QMenu, QAction, QPushButton, QLabel
+from PyQt5.QtCore import Qt, QPoint, QTimer, QTime
 from PyQt5.QtGui import QContextMenuEvent
 from random import randint
 import copy
@@ -9,6 +10,21 @@ from PyQt5.QtWidgets import QMessageBox
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 from A_star import free_up_space
+
+def process_moves(filename, parking_lot):
+    with open(filename, 'r') as file:
+        for line in file:
+            action, car_id_str = line[0], line[1:].strip()  # Split the action (+/-) and car ID
+            
+            if action == '+':  # If the action is to add a car
+                parking_lot.addCarAtDepot()
+            elif action == '-':  # If the action is to remove a car
+                car_id = int(car_id_str)
+                parking_lot.remove_car(car_id)  # Assuming remove_car is a method to remove cars
+            else:
+                print(f"Invalid action in line: {line}")
+
+            # parking_lot.countdown(5000)
 
 class ParkingLot(QWidget):
     def __init__(self, parser):
@@ -45,12 +61,28 @@ class ParkingLot(QWidget):
         self.addButton.clicked.connect(self.removeCarFromDetpot)
         self.layout.addWidget(self.addButton)
 
+        self.loadMovesButton = QPushButton('Load Moves from File', self)
+        self.loadMovesButton.clicked.connect(self.loadMovesFromFile)
+        self.layout.addWidget(self.loadMovesButton)
+
 
         window_width = (self.num_cols + 1) * self.parking_width
         window_height = (self.num_rows + 1) * self.parking_height
 
         # Set the fixed window size
         self.setFixedSize(window_width, window_height)
+
+    def loadMovesFromFile(self):
+        initialDir = './moves'
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, 
+                    "Select Move File", 
+                    initialDir,  # Set the initial directory here
+                    "All Files (*);;Text Files (*.txt)", 
+                    options=options)
+        if fileName:
+            process_moves(fileName, self)
 
     def is_free_space(self):
         free_space_count = 0  # Counter for unoccupied spaces
@@ -351,7 +383,7 @@ class ParkingLot(QWidget):
                     r += 1
                 c += 1
             s += 1
-                    
         
+
 
         
