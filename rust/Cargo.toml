@@ -1,0 +1,18 @@
+[package]
+name = "a_star_parking_module_rust"
+crate-type = ["cdylib"]
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "a_star_parking_module_rust"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.15.1"
+features = ["extension-module"]
+
+# Release profile optimizations
+[profile.release]
+lto = true
+codegen-units = 1

@@ -1,0 +1,13 @@
+depot podświetlić,
+zwalnianie depotu,
+button add car,
+vector
+
+input na sztywno
+
+czas wyświetlać na oknie a nie tylko w konsoli
+
+17:05 raport z Paszkiem
+
+
+odliczanie
