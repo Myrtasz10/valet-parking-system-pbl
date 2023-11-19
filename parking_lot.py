@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene, QMenu, QAction, QPushButton
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene, QMenu, QAction, QPushButton, QTextEdit
 from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtGui import QContextMenuEvent, QFont
 from random import randint
 import copy
 import time
@@ -37,6 +37,7 @@ class ParkingLot(QWidget):
         self.scene = QGraphicsScene(self)
         self.view.setScene(self.scene)
         self.addGrid()
+        
         self.addButton = QPushButton('Add Car at Depot', self)
         self.addButton.clicked.connect(self.addCarAtDepot)
         self.layout.addWidget(self.addButton)
@@ -44,6 +45,11 @@ class ParkingLot(QWidget):
         self.addButton = QPushButton('Remove Car from Depot', self)
         self.addButton.clicked.connect(self.removeCarFromDetpot)
         self.layout.addWidget(self.addButton)
+        
+        self.text_edit = QTextEdit(self)
+        self.text_edit.setFont(QFont('Arial', 10))
+        self.text_edit.setReadOnly(True)
+        self.layout.addWidget(self.text_edit)
 
 
         window_width = (self.num_cols + 1) * self.parking_width
@@ -51,7 +57,15 @@ class ParkingLot(QWidget):
 
         # Set the fixed window size
         self.setFixedSize(window_width, window_height)
-
+    
+    def add_text_to_field(self, text):
+        current_text = self.text_edit.toPlainText()
+        if current_text:
+            current_text += '\n' + text
+        else:
+            current_text = text
+        self.text_edit.setPlainText(current_text)
+        
     def is_free_space(self):
         free_space_count = 0  # Counter for unoccupied spaces
         for col_spaces in self.parking_spaces:
