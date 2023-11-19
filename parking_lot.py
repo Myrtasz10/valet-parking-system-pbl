@@ -24,7 +24,7 @@ def process_moves(filename, parking_lot):
             else:
                 print(f"Invalid action in line: {line}")
 
-            # parking_lot.countdown(5000)
+            # parking_lot.cooldown(5000)
 
 class ParkingLot(QWidget):
     def __init__(self, parser):
@@ -62,18 +62,19 @@ class ParkingLot(QWidget):
         self.addButton.clicked.connect(self.removeCarFromDetpot)
         self.layout.addWidget(self.addButton)
         
-        self.text_edit = QTextEdit(self)
-        self.text_edit.setFont(QFont('Arial', 10))
-        self.text_edit.setReadOnly(True)
-        self.layout.addWidget(self.text_edit)
-
         self.loadMovesButton = QPushButton('Load Moves from File', self)
         self.loadMovesButton.clicked.connect(self.loadMovesFromFile)
         self.layout.addWidget(self.loadMovesButton)
 
+        self.text_edit = QTextEdit(self)
+        self.text_edit.setFixedHeight(200)
+        self.text_edit.setFont(QFont('Arial', 10))
+        self.text_edit.setReadOnly(True)
+        self.layout.addWidget(self.text_edit)
+
 
         window_width = (self.num_cols + 1) * self.parking_width
-        window_height = (self.num_rows + 1) * self.parking_height
+        window_height = (self.num_rows + 1) * self.parking_height + 300
 
         # Set the fixed window size
         self.setFixedSize(window_width, window_height)
@@ -93,7 +94,7 @@ class ParkingLot(QWidget):
     def add_text_to_field(self, text):
         current_text = self.text_edit.toPlainText()
         if current_text:
-            current_text += '\n' + text
+            current_text += '\n\n' + text
         else:
             current_text = text
         self.text_edit.setPlainText(current_text)

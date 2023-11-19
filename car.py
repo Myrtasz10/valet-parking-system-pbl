@@ -92,8 +92,8 @@ class Car(QGraphicsRectItem):
         moveRight.triggered.connect(self.move_right)
         moveToDepot.triggered.connect(self.move_to_depot)
         moveToDestination.triggered.connect(lambda: self.move_to_destination("python"))
-        moveToDestinationCpp.triggered.connect(self.move_to_destination_cpp)
-        moveToDestinationRust.triggered.connect(self.move_to_destination_rust)
+        moveToDestinationCpp.triggered.connect(lambda: self.move_to_destination("cpp"))
+        moveToDestinationRust.triggered.connect(lambda: self.move_to_destination("rust"))
         removeCar.triggered.connect(self.remove)
         
         moveMenu.addAction(moveUp)
