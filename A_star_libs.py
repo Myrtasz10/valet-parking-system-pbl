@@ -10,7 +10,7 @@ if os.name == 'posix':
     from rust import a_star_parking_module_rust
 elif os.name == 'nt':
     #windows
-    pass
+    from rust import a_star_parking_module_rust
 else:
     raise EnvironmentError("Unsupported OS")
 

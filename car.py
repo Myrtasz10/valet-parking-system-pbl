@@ -317,7 +317,7 @@ class Car(QGraphicsRectItem):
         print(moves)
 
         # Prepare the message to display
-        message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
+        message = f"Number of moves: {len(moves)}\nCalculation time: {(elapsed_time_calculation * 1000):.5f} miliseconds\nMoving time: {elapsed_time_moving:.3f} seconds"
         
         # Display the result in a pop-up message box
         QMessageBox.information(None, "Movement Results", message)

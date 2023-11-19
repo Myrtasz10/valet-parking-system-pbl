@@ -17,6 +17,9 @@ def process_moves(filename, parking_lot):
             else:
                 print(f"Invalid action in line: {line}")
 
+            time.sleep(0)
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
@@ -26,7 +29,7 @@ if __name__ == '__main__':
     parking_lot = ParkingLot(parser)
     parking_lot.show()
 
-    # process_moves("test.moves", parking_lot)
+    process_moves("test.moves", parking_lot)
 
     try:
         sys.exit(app.exec_())
