@@ -91,7 +91,7 @@ class Car(QGraphicsRectItem):
         moveLeft.triggered.connect(self.move_left)
         moveRight.triggered.connect(self.move_right)
         moveToDepot.triggered.connect(self.move_to_depot)
-        moveToDestination.triggered.connect(self.move_to_destination)
+        moveToDestination.triggered.connect(lambda: self.move_to_destination("python"))
         moveToDestinationCpp.triggered.connect(self.move_to_destination_cpp)
         moveToDestinationRust.triggered.connect(self.move_to_destination_rust)
         removeCar.triggered.connect(self.remove)
@@ -241,7 +241,7 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[end_space[0]][end_space[1]].car = self
 
 
-    def move_to_destination(self):
+    def move_to_destination(self, lang):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
 
@@ -255,15 +255,37 @@ class Car(QGraphicsRectItem):
             self.setBrush(QColor('#000066'))
             self.is_moving = False
             return
-            
-        moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination(self.parking_spaces, destination, self.id)
+        
+        # can't assign to none type
+        moves = None
+        elapsed_time_calculation = None
+        elapsed_time_moving = None
+        
+        match lang:
+            case "python":        
+                moves_, elapsed_time_calculation_, elapsed_time_moving_ = move_car_to_destination(self.parking_spaces, destination, self.id)
+                moves = moves_
+                elapsed_time_calculation = elapsed_time_calculation_
+                elapsed_time_moving = elapsed_time_moving_
+            case "cpp":        
+                moves_, elapsed_time_calculation_, elapsed_time_moving_ = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
+                moves = moves_
+                elapsed_time_calculation = elapsed_time_calculation_
+                elapsed_time_moving = elapsed_time_moving_
+            case "rust":        
+                moves_, elapsed_time_calculation_, elapsed_time_moving_ = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
+                moves = moves_
+                elapsed_time_calculation = elapsed_time_calculation_
+                elapsed_time_moving = elapsed_time_moving_
+                
         print(moves)
 
-        # Prepare the message to display
-        message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
-        
-        # Display the result in a pop-up message box
-        QMessageBox.information(None, "Movement Results", message)
+        self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation:.2f} seconds, moving time: {elapsed_time_moving:.2f} seconds")
+
+        # # Prepare the message to display
+        # message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
+        # # Display the result in a pop-up message box
+        # QMessageBox.information(None, "Movement Results", message)
 
 
         self.setBrush(QColor('#000066'))
