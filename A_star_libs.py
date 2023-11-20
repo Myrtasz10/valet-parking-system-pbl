@@ -10,7 +10,7 @@ if os.name == 'posix':
     from rust import a_star_parking_module_rust
 elif os.name == 'nt':
     #windows
-    #from rust import a_star_parking_module_rust
+    from rust import a_star_parking_module_rust
     pass
 else:
     raise EnvironmentError("Unsupported OS")
@@ -93,5 +93,39 @@ def move_car_to_destination_rust(parking_spaces, destination, id):
     elapsed_time_moving = end_time_moving - start_time_moving
 
     parking_spaces[destination[0]][destination[1]].unsetAsDestination()
+
+    return moves, elapsed_time_calculation, elapsed_time_moving
+
+
+def free_up_space_rust(parking_spaces, destination):
+    start_state = parking_spaces_to_ids_for_cpp(parking_spaces)
+    target_car_id = -1
+
+    start_time_calculation = time.time()
+
+    # Call the a_star_parking function from your Rust module
+    moves = a_star_parking_module_rust.a_star_parking_py(start_state, target_car_id, destination)
+
+    end_time_calculation = time.time()
+    elapsed_time_calculation = end_time_calculation - start_time_calculation
+    print(f"Elapsed time for freeing up space Rust version: {elapsed_time_calculation} seconds")
+
+    start_time_moving = time.time()
+
+    for move in moves:
+        direction, (src_x, src_y), (dest_x, dest_y) = move
+
+        if direction == 'right':
+            parking_spaces[src_x][src_y].car.move_right()
+        elif direction == 'up':
+            parking_spaces[src_x][src_y].car.move_up()
+        elif direction == 'left':
+            parking_spaces[src_x][src_y].car.move_left()
+        elif direction == 'down':
+            parking_spaces[src_x][src_y].car.move_down()
+
+    end_time_moving = time.time()
+    elapsed_time_moving = end_time_moving - start_time_moving
+
 
     return moves, elapsed_time_calculation, elapsed_time_moving
