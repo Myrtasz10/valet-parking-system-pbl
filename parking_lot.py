@@ -53,6 +53,13 @@ class ParkingLot(QWidget):
         self.scene = QGraphicsScene(self)
         self.view.setScene(self.scene)
         self.addGrid()
+
+        self.timer_label = QLabel('Elapsed Time: 00:00:00', self)
+        self.layout.addWidget(self.timer_label)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_timer)
+        self.start_time = QTime(0, 0)
         
         self.addButton = QPushButton('Add Car at Depot', self)
         self.addButton.clicked.connect(self.addCarAtDepot)
@@ -61,7 +68,7 @@ class ParkingLot(QWidget):
         self.addButton = QPushButton('Remove Car from Depot', self)
         self.addButton.clicked.connect(self.removeCarFromDetpot)
         self.layout.addWidget(self.addButton)
-        
+
         self.loadMovesButton = QPushButton('Load Moves from File', self)
         self.loadMovesButton.clicked.connect(self.loadMovesFromFile)
         self.layout.addWidget(self.loadMovesButton)
@@ -78,6 +85,25 @@ class ParkingLot(QWidget):
 
         # Set the fixed window size
         self.setFixedSize(window_width, window_height)
+        
+    def start_timer(self):
+        print("Starting timer!")
+        if not self.timer.isActive():
+            self.timer.start(40)  # Timer interval in milliseconds
+            self.start_time = QTime.currentTime().addSecs(-self.start_time.secsTo(QTime(0, 0)))
+            self.start_button.setEnabled(False)
+
+    def update_timer(self):
+        current_time = QTime.currentTime()
+        elapsed_time = self.start_time.elapsed()
+        elapsed_time_str = QTime(0, 0).addMSecs(elapsed_time).toString('mm:ss:zzz')
+        self.timer_label.setText(f'Elapsed Time: {elapsed_time_str}')
+
+    def stop_timer(self):
+        print("Stopping timer!")
+        self.timer.stop()
+        self.start_button.setEnabled(True)
+        self.start_time = QTime(0, 0)
         
     def loadMovesFromFile(self):
         initialDir = './moves'
