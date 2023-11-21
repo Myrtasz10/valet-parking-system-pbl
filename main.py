@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QEventLoop
 import sys
 from input_parser import Parser
 from parking_lot import ParkingLot
 import time
+import asyncio
 
 
 
@@ -14,6 +16,7 @@ if __name__ == '__main__':
 
     parking_lot = ParkingLot(parser)
     parking_lot.show()
+    
 
     try:
         sys.exit(app.exec_())
