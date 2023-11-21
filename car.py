@@ -1,20 +1,55 @@
 from asyncore import loop
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsRectItem, QMenu, QAction, QInputDialog, QMessageBox
-from PyQt5.QtCore import QVariantAnimation, QPointF, QPoint, QCoreApplication
+from PyQt5.QtCore import QThread, QVariantAnimation, QPointF, QPoint, QCoreApplication
 from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop, Qt, QTimer
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen, QFontMetrics
 from A_star import move_car_to_destination
 from A_star_libs import move_car_to_destination_cpp, move_car_to_destination_rust
-import asyncio
-wywal wszystko i zrób hello students
+import time
+
+class WorkerThread(QThread):
+    moves_signal = pyqtSignal(str)
+    elapsed_time_calculation_signal = pyqtSignal(str)
+    elapsed_time_moving_signal = pyqtSignal(str)
+    
+    def __init__(self, parking_spaces, destination, car_id, parking_lot, lang, parent=None):
+        super(WorkerThread, self).__init__(parent)
+        self.parking_spaces = parking_spaces
+        self.destination = destination
+        self.car_id = car_id
+        self.parking_lot = parking_lot
+        self.lang = lang
+        
+
+    def run(self):
+        #try and delete declarations
+        moves = []
+        elapsed_time_calculation = 0.0
+        elapsed_time_moving = 0.0
+        match self.lang:
+            case "python":        
+                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination(self.parking_spaces, self.destination, self.car_id)
+            case "cpp":        
+                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_cpp(self.parking_spaces, self.destination, self.car_id)
+            case "rust":        
+                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, self.destination, self.car_id)
+                
+        print(moves)
+
+        self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation*1000:.2f} milliseconds, moving time: {elapsed_time_moving:.2f} seconds")
+        self.parking_lot.stop_timer()
+        # # Prepare the message to display
+        # message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
+        # # Display the result in a pop-up message box
+        # QMessageBox.information(None, "Movement Results", message)
+        
+
 class Car(QGraphicsRectItem):
-    settingDestinationSignal = pyqtSignal(object) 
-
     next_id = 0
-    task_complete = pyqtSignal()
-
+    # lang to be passed to Worker which does not take arguments
+    lang = ""
     def __init__(self, col, row, width, height, speed, containing_parking_lot):
         self.parking_space_width = width + 10
         self.parking_space_height = height + 10
@@ -40,8 +75,7 @@ class Car(QGraphicsRectItem):
 
         self.is_moving = False
         
-        self.timer = QTimer()
-        self.timer.setSingleShot(True)
+        self.lang = ""
 
     def paint(self, painter, option, widget):
         super().paint(painter, option, widget)
@@ -116,12 +150,6 @@ class Car(QGraphicsRectItem):
         contextMenu.addAction(removeCar)
         
         contextMenu.exec_(event.screenPos())
-    
-    def start_event_loop(self):
-        loop = QCoreApplication.instance()
-        if loop is None:
-            loop = QCoreApplication([])
-        return loop
         
     def animate(self, start_space, end_space, 
                 parking_space_width, parking_space_height, speed, distance):
@@ -251,12 +279,10 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[end_space[0]][end_space[1]].car = self
 
 
-    async def move_to_destination(self, lang):
+    def move_to_destination(self, lang):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
         
-        loop = QCoreApplication.instance()
-
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
 
@@ -267,38 +293,13 @@ class Car(QGraphicsRectItem):
             self.setBrush(QColor('#000066'))
             self.is_moving = False
             return
-        async def async_main():
-            moves = []
-            elapsed_time_calculation = 0.0
-            elapsed_time_moving = 0.0
-            match lang:
-                case "python":        
-                    moves, elapsed_time_calculation, elapsed_time_moving = await move_car_to_destination(self.parking_spaces, destination, self.id)
-                case "cpp":        
-                    moves, elapsed_time_calculation, elapsed_time_moving = await move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
-                case "rust":        
-                    moves, elapsed_time_calculation, elapsed_time_moving = await move_car_to_destination_rust(self.parking_spaces, destination, self.id)
-                
-            print(moves)
+        
+        self.parking_lot.start_timer()
+        
+        self.worker = WorkerThread(self.parking_spaces, destination, self.id, self.parking_lot, lang)
+        self.worker.start()
+        self.worker.finished.connect(self.evt_worker_finished)
 
-            self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation*1000:.2f} milliseconds, moving time: {elapsed_time_moving:.2f} seconds")
-            self.parking_lot.stop_timer()
-            # # Prepare the message to display
-            # message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
-            # # Display the result in a pop-up message box
-            # QMessageBox.information(None, "Movement Results", message)
-
-            self.setBrush(QColor('#000066'))
-            self.is_moving = False
-            self.task_complete.emit()
-        #     loop.quit()
-        # asyncio.ensure_future(async_main())
-        self.task_complete.connect(loop.quit)
-        asyncio.ensure_future(async_main())
-        loop.exec_()
-        # timer = QTimer()
-        # timer.singleShot(0, loop.run)
-        # loop.exec_()
             
 
     def move_to_depot_rust(self):
@@ -326,3 +327,7 @@ class Car(QGraphicsRectItem):
         # Update the parking space to mark it as unoccupied
         self.parking_lot.parking_spaces[self.col][self.row].car = None
         self.parking_lot.parking_spaces[self.col][self.row].occupied = False
+        
+    def evt_worker_finished(self):
+        self.setBrush(QColor('#000066'))
+        self.is_moving = False

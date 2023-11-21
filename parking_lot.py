@@ -92,7 +92,6 @@ class ParkingLot(QWidget):
         if not self.timer.isActive():
             self.timer.start(40)  # Timer interval in milliseconds
             self.start_time = QTime.currentTime().addSecs(-self.start_time.secsTo(QTime(0, 0)))
-            self.start_button.setEnabled(False)
 
     def update_timer(self):
         current_time = QTime.currentTime()
@@ -103,7 +102,6 @@ class ParkingLot(QWidget):
     def stop_timer(self):
         print("Stopping timer!")
         self.timer.stop()
-        self.start_button.setEnabled(True)
         self.start_time = QTime(0, 0)
         
     def loadMovesFromFile(self):
