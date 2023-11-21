@@ -32,6 +32,8 @@ class ParkingLot(QWidget):
         super().__init__()
         self.parser = parser
 
+        self.setWindowTitle('Valet Parking System')
+
         self.parking_spaces = []
         parking_singleton = ParkingSpaceSingleton()
         parking_singleton.parking_spaces = self.parking_spaces 
