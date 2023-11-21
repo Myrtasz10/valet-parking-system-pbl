@@ -119,7 +119,7 @@ class ParkingLot(QWidget):
     def add_text_to_field(self, text):
         current_text = self.text_edit.toPlainText()
         if current_text:
-            current_text += '\n\n' + text
+            current_text += text
         else:
             current_text = text
         self.text_edit.setPlainText(current_text)

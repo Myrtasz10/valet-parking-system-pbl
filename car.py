@@ -10,9 +10,9 @@ from A_star_libs import move_car_to_destination_cpp, move_car_to_destination_rus
 import time
 
 class WorkerThread(QThread):
-    moves_signal = pyqtSignal(str)
-    elapsed_time_calculation_signal = pyqtSignal(str)
-    elapsed_time_moving_signal = pyqtSignal(str)
+    moves_signal = pyqtSignal(int)
+    elapsed_time_calculation_signal = pyqtSignal(float)
+    elapsed_time_moving_signal = pyqtSignal(float)
     
     def __init__(self, parking_spaces, destination, car_id, parking_lot, lang, parent=None):
         super(WorkerThread, self).__init__(parent)
@@ -28,6 +28,7 @@ class WorkerThread(QThread):
         moves = []
         elapsed_time_calculation = 0.0
         elapsed_time_moving = 0.0
+        print("starting calculation")
         match self.lang:
             case "python":        
                 moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination(self.parking_spaces, self.destination, self.car_id)
@@ -35,11 +36,17 @@ class WorkerThread(QThread):
                 moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_cpp(self.parking_spaces, self.destination, self.car_id)
             case "rust":        
                 moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, self.destination, self.car_id)
-                
+        print("ending calculation")
         print(moves)
 
-        self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation*1000:.2f} milliseconds, moving time: {elapsed_time_moving:.2f} seconds")
-        self.parking_lot.stop_timer()
+        self.moves_signal.emit(len(moves))
+        self.elapsed_time_calculation_signal.emit(elapsed_time_calculation)
+        self.elapsed_time_moving_signal.emit(elapsed_time_moving)
+        #PROBLEM NIE LEŻY TUTAJ, TO OBLICZENIA UŻYWAJĄ TIMERÓW
+        #STOPPING TIMER TWICE?
+        #still nie działa
+        #TODO: take stop and print out of here, this may cause the timer issues - you shouldn't access stuff from another thread
+        # self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation*1000:.2f} milliseconds, moving time: {elapsed_time_moving:.2f} seconds")
         # # Prepare the message to display
         # message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
         # # Display the result in a pop-up message box
@@ -298,10 +305,22 @@ class Car(QGraphicsRectItem):
         
         self.worker = WorkerThread(self.parking_spaces, destination, self.id, self.parking_lot, lang)
         self.worker.start()
-        self.worker.finished.connect(self.evt_worker_finished)
+        self.worker.finished.connect(self.evt_worker_finished)   
+        
+        self.worker.moves_signal.connect(self.write_1)
+        self.worker.elapsed_time_calculation_signal.connect(self.write_2)
+        self.worker.elapsed_time_moving_signal.connect(self.write_3)
 
-            
-
+    def write_1(self, val):
+        self.parking_lot.add_text_to_field(f"Number of moves: {val}, ")
+        
+    def write_2(self, val):
+        self.parking_lot.add_text_to_field(f"calculation time: {val*1000:.2f} milliseconds, ")
+        
+    def write_3(self, val):
+        self.parking_lot.add_text_to_field(f"moving time: {val:.2f} seconds\n\n")
+        self.parking_lot.stop_timer()
+        
     def move_to_depot_rust(self):
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
@@ -331,3 +350,4 @@ class Car(QGraphicsRectItem):
     def evt_worker_finished(self):
         self.setBrush(QColor('#000066'))
         self.is_moving = False
+        self.parking_lot.stop_timer()
