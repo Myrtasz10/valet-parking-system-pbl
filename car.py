@@ -93,9 +93,9 @@ class Car(QGraphicsRectItem):
         moveLeft.triggered.connect(self.move_left)
         moveRight.triggered.connect(self.move_right)
         moveToDepot.triggered.connect(self.move_to_depot)
-        moveToDestination.triggered.connect(lambda: self.run_async_function("python"))
-        moveToDestinationCpp.triggered.connect(lambda: self.run_async_function("cpp"))
-        moveToDestinationRust.triggered.connect(lambda: self.run_async_function("rust"))
+        moveToDestination.triggered.connect(lambda: self.move_to_destination("python"))
+        moveToDestinationCpp.triggered.connect(lambda: self.move_to_destination("cpp"))
+        moveToDestinationRust.triggered.connect(lambda: self.move_to_destination("rust"))
         removeCar.triggered.connect(self.remove)
         
         moveMenu.addAction(moveUp)
@@ -112,9 +112,6 @@ class Car(QGraphicsRectItem):
         contextMenu.addAction(removeCar)
         
         contextMenu.exec_(event.screenPos())
-
-    def run_async_function(self, lang):
-        self.timer.singleShot(0, lambda: asyncio.create_task(self.move_to_destination(lang)))
 
     def animate(self, start_space, end_space, 
                 parking_space_width, parking_space_height, speed, distance):
@@ -244,11 +241,9 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[end_space[0]][end_space[1]].car = self
 
 
-    async def move_to_destination(self, lang):
+    def move_to_destination(self, lang):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
-        
-        self.parking_lot.start_timer()
 
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
@@ -261,22 +256,19 @@ class Car(QGraphicsRectItem):
             self.is_moving = False
             return
         
+        self.parking_lot.start_timer()
+        
         moves = []
         elapsed_time_calculation = 0.0
         elapsed_time_moving = 0.0
-        async def move_car():
-            nonlocal moves
-            nonlocal elapsed_time_calculation
-            nonlocal elapsed_time_moving
-            match lang:
-                case "python":        
-                    moves, elapsed_time_calculation, elapsed_time_moving = await move_car_to_destination(self.parking_spaces, destination, self.id)
-                case "cpp":        
-                    moves, elapsed_time_calculation, elapsed_time_moving = await move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
-                case "rust":        
-                    moves, elapsed_time_calculation, elapsed_time_moving = await move_car_to_destination_rust(self.parking_spaces, destination, self.id)
+        match lang:
+            case "python":        
+                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination(self.parking_spaces, destination, self.id)
+            case "cpp":        
+                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_cpp(self.parking_spaces, destination, self.id)
+            case "rust":        
+                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, destination, self.id)
                 
-        await move_car()
         print(moves)
 
         self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation*1000:.2f} milliseconds, moving time: {elapsed_time_moving:.2f} seconds")
