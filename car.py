@@ -115,6 +115,7 @@ class Car(QGraphicsRectItem):
 
     def run_async_function(self, lang):
         self.timer.singleShot(0, lambda: asyncio.create_task(self.move_to_destination(lang)))
+        # self.move_to_destination(lang)
 
     def animate(self, start_space, end_space, 
                 parking_space_width, parking_space_height, speed, distance):
