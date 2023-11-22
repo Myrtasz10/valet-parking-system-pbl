@@ -16,6 +16,7 @@ if __name__ == '__main__':
 
     parking_lot = ParkingLot(parser)
     parking_lot.show()
+    parking_lot.setWindowTitle('Valet Parking System')
     
 
     try:
