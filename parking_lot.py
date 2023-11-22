@@ -9,8 +9,8 @@ from PyQt5.QtWidgets import QMessageBox
 
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
-from A_star import free_up_space
-#from A_star_libs import free_up_space_rust as free_up_space
+# from A_star import free_up_space
+from A_star_libs import free_up_space_rust as free_up_space
 
 def process_moves(filename, parking_lot):
     with open(filename, 'r') as file:
