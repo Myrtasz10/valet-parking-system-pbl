@@ -15,8 +15,6 @@ def move_car_to_destination(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids(parking_spaces)
     target_car_id = id
 
-    parking_spaces[destination[0]][destination[1]].setAsDestination()
-
     start_time_calculation = time.time()
     moves = a_star_parking(start_state, target_car_id, destination)
     end_time_calculation = time.time()

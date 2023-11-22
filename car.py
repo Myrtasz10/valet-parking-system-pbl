@@ -8,6 +8,7 @@ from PyQt5.QtGui import QPainter, QFont, QColor, QPainter, QPen, QFontMetrics
 from A_star import move_car_to_destination
 from A_star_libs import move_car_to_destination_cpp, move_car_to_destination_rust
 import time
+import asyncio
 
 class WorkerThread(QThread):
     moves_list_signal = pyqtSignal(list)
@@ -302,7 +303,7 @@ class Car(QGraphicsRectItem):
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
 
-        
+        self.parking_spaces[self.destination[0]][self.destination[1]].setAsDestination()
         self.parking_lot.start_timer()
         
         #move to init if it is garbage collected
@@ -334,8 +335,7 @@ class Car(QGraphicsRectItem):
         elapsed_time_moving = end_time_moving - start_time_moving
 
         self.parking_spaces[self.destination[0]][self.destination[1]].unsetAsDestination()
-        self.parking_lot.add_text_to_field(f"number of moves: {len(val)}, ")
-        self.parking_lot.add_text_to_field(f"moving time: {elapsed_time_moving:.2f} seconds\n\n")
+        self.parking_lot.add_text_to_field(f"Moving time: {elapsed_time_moving:.2f} seconds, number of moves: {len(val)}, ")
         self.parking_lot.stop_timer()
         self.setBrush(QColor('#000066'))
         self.is_moving = False
@@ -344,7 +344,7 @@ class Car(QGraphicsRectItem):
             self.parking_lot.removeCarFromDetpot()
         
     def write_2(self, val):
-        self.parking_lot.add_text_to_field(f"Calculation time: {val*1000:.2f} milliseconds, ")
+        self.parking_lot.add_text_to_field(f"calculation time: {val*1000:.2f} milliseconds\n\n")
         
     # this function is now redundant; call move_to_destination with extra parameters instead
     # def move_to_depot(self, lang):

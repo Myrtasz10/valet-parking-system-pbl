@@ -1,7 +1,7 @@
 import time
 import os
 import sys
-
+from PyQt5.QtCore import QThread, QObject, pyqtSignal
 # sys.path.append('./cpp')  # Ensure the cpp directory is in the PYTHONPATH
 
 if os.name == 'posix':
@@ -26,8 +26,6 @@ def parking_spaces_to_ids_for_cpp(parking_spaces):
 def move_car_to_destination_cpp(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids_for_cpp(parking_spaces)
     target_car_id = id
-    
-    parking_spaces[destination[0]][destination[1]].setAsDestination()
 
     start_time_calculation = time.time()
 
@@ -63,14 +61,12 @@ def move_car_to_destination_cpp(parking_spaces, destination, id):
 def move_car_to_destination_rust(parking_spaces, destination, id):
     start_state = parking_spaces_to_ids_for_cpp(parking_spaces)
     target_car_id = id
-    
-    parking_spaces[destination[0]][destination[1]].setAsDestination()
 
     start_time_calculation = time.time()
-
+    print("starting")
     # Call the a_star_parking function from your Rust module
     moves = a_star_parking_module_rust.a_star_parking_py(start_state, target_car_id, destination)
-
+    print("ending")
     end_time_calculation = time.time()
     elapsed_time_calculation = end_time_calculation - start_time_calculation
     print(f"Elapsed time for Rust version: {elapsed_time_calculation} seconds")
@@ -94,7 +90,7 @@ def move_car_to_destination_rust(parking_spaces, destination, id):
 
     # parking_spaces[destination[0]][destination[1]].unsetAsDestination()
 
-    return moves, elapsed_time_calculation, #elapsed_time_moving
+    return moves, elapsed_time_calculation #elapsed_time_moving
 
 
 def free_up_space_rust(parking_spaces, destination):

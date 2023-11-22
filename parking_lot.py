@@ -10,8 +10,8 @@ from PyQt5.QtWidgets import QMessageBox
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 #TODO: change to rust
-from A_star import free_up_space
-#from A_star_libs import free_up_space_rust as free_up_space
+#from A_star import free_up_space
+from A_star_libs import free_up_space_rust as free_up_space
 
 def process_moves(filename, parking_lot):
     parking_lot.steps = []
@@ -116,7 +116,7 @@ class ParkingLot(QWidget):
     def add_text_to_field(self, text):
         current_text = self.text_edit.toPlainText()
         if current_text:
-            current_text += text
+            current_text = text + current_text
         else:
             current_text = text
         self.text_edit.setPlainText(current_text)
@@ -164,7 +164,7 @@ class ParkingLot(QWidget):
         for col in self.parking_spaces:
             for space in col:
                 if space.occupied and space.car.id == car_id:
-                    space.car.move_to_destination('python', 0, 0) #trzeba zrobić łańcuch, tylko jak? (dokładniej w wywołaniach z pliku, u góry) może niech wywołanie tego u góry się przerywa, a potem wznawia w sytuacji kiedy auto zawoła? taki sygnał często wysyłany z którym można coś zrobić lub nie
+                    space.car.move_to_destination('rust', 0, 0) #trzeba zrobić łańcuch, tylko jak? (dokładniej w wywołaniach z pliku, u góry) może niech wywołanie tego u góry się przerywa, a potem wznawia w sytuacji kiedy auto zawoła? taki sygnał często wysyłany z którym można coś zrobić lub nie
                     #self.removeCarFromDetpot()
                     return  # Stop after removing the car
 
@@ -272,7 +272,6 @@ class ParkingLot(QWidget):
                     if c > 0:
                         if not parking_lot[c-1][r]:
                             print("left")
-                            print(parking_lot)
                             parking_lot[c][r] = False
                             parking_lot[c-1][r] = True
                             
@@ -282,59 +281,41 @@ class ParkingLot(QWidget):
                                 self.pathfindToDepot(col, row, copy.deepcopy(history), copy.deepcopy(parking_lot))
                                 
                             print("exit left")
-                            print(parking_lot)
                             parking_lot[c][r] = True
                             parking_lot[c-1][r] = False
-                            print(parking_lot)
                     #up
                     if r > 0: 
                         if not parking_lot[c][r-1]:
-                            print("up")
-                            print(parking_lot)
                             parking_lot[c][r] = False
                             parking_lot[c][r-1] = True
                             if c == col and r == row:
                                 self.pathfindToDepot(col, row-1, copy.deepcopy(history), copy.deepcopy(parking_lot))
                             else:
                                 self.pathfindToDepot(col, row, copy.deepcopy(history), copy.deepcopy(parking_lot))
-                            print("exit up")
-                            print(parking_lot)
                             parking_lot[c][r] = True
                             parking_lot[c][r-1] = False         
-                            print(parking_lot)
-
                     #right
                     if c < self.num_cols - 1:
                         if not parking_lot[c+1][r]:
-                            print("right")
-                            print(parking_lot)
                             parking_lot[c][r] = False
                             parking_lot[c+1][r] = True
                             if c == col and r == row:
                                 self.pathfindToDepot(col+1, row, copy.deepcopy(history), copy.deepcopy(parking_lot))
                             else:
                                 self.pathfindToDepot(col, row, copy.deepcopy(history), copy.deepcopy(parking_lot))
-                            print("exit right")
-                            print(parking_lot)
                             parking_lot[c][r] = True
                             parking_lot[c+1][r] = False
-                            print(parking_lot)
                     #down
                     if r < self.num_rows - 1: 
                         if not parking_lot[c][r+1]:
-                            print("down")
-                            print(parking_lot)
                             parking_lot[c][r] = False
                             parking_lot[c][r+1] = True
                             if c == col and r == row:
                                 self.pathfindToDepot(col, row+1, copy.deepcopy(history), copy.deepcopy(parking_lot))
                             else:
                                 self.pathfindToDepot(col, row, copy.deepcopy(history), copy.deepcopy(parking_lot))
-                            print("exit down")
-                            print(parking_lot)
                             parking_lot[c][r] = True
                             parking_lot[c][r+1] = False
-                            print(parking_lot)
                 r += 1
             c += 1
             
