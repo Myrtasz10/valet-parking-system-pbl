@@ -163,7 +163,7 @@ class ParkingLot(QWidget):
         for col in self.parking_spaces:
             for space in col:
                 if space.occupied and space.car.id == car_id:
-                    space.car.move_to_destination('python', 0, 0) #trzeba zrobić łańcuch, tylko jak? (dokładniej w wywołaniach z pliku, u góry) może niech wywołanie tego u góry się przerywa, a potem wznawia w sytuacji kiedy auto zawoła? taki sygnał często wysyłany z którym można coś zrobić lub nie
+                    space.car.move_to_destination('rust', 0, 0) #trzeba zrobić łańcuch, tylko jak? (dokładniej w wywołaniach z pliku, u góry) może niech wywołanie tego u góry się przerywa, a potem wznawia w sytuacji kiedy auto zawoła? taki sygnał często wysyłany z którym można coś zrobić lub nie
                     #self.removeCarFromDetpot()
                     return  # Stop after removing the car
 

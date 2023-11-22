@@ -10,6 +10,10 @@
 *.userosscache
 *.sln.docstates
 
+#libraries
+*.pyd
+*.dll
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
