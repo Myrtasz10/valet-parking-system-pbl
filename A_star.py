@@ -30,6 +30,7 @@ def move_car_to_destination(parking_spaces, destination, id):
     for move in moves:
         direction, (src_x, src_y), (dest_x, dest_y) = move
 
+        # signals for this
         if direction == 'right':
             parking_spaces[src_x][src_y].car.move_right()
         elif direction == 'up':

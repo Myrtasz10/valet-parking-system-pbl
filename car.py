@@ -9,10 +9,20 @@ from A_star import move_car_to_destination
 from A_star_libs import move_car_to_destination_cpp, move_car_to_destination_rust
 import time
 
+class MovesList:
+    def __init__(self, moves_list):
+        self.moves_list = moves_list
+
 class WorkerThread(QThread):
-    moves_signal = pyqtSignal(int)
+    moves_list_signal = pyqtSignal(list)
     elapsed_time_calculation_signal = pyqtSignal(float)
     elapsed_time_moving_signal = pyqtSignal(float)
+    # 0 - right
+    #1- up
+    #2- left
+    #3- down
+    move_direction_signal = pyqtSignal(int)
+    
     
     def __init__(self, parking_spaces, destination, car_id, parking_lot, lang, parent=None):
         super(WorkerThread, self).__init__(parent)
@@ -42,6 +52,7 @@ class WorkerThread(QThread):
         self.moves_signal.emit(len(moves))
         self.elapsed_time_calculation_signal.emit(elapsed_time_calculation)
         self.elapsed_time_moving_signal.emit(elapsed_time_moving)
+        #policz i zwróć na główny wątek od razu, stąd będziemy wywoływać przesunięcia
         #PROBLEM NIE LEŻY TUTAJ, TO OBLICZENIA UŻYWAJĄ TIMERÓW
         #STOPPING TIMER TWICE?
         #still nie działa
@@ -51,6 +62,7 @@ class WorkerThread(QThread):
         # message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
         # # Display the result in a pop-up message box
         # QMessageBox.information(None, "Movement Results", message)
+    
         
 
 class Car(QGraphicsRectItem):
@@ -285,7 +297,18 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[start_space[0]][start_space[1]].car = None 
         self.parking_spaces[end_space[0]][end_space[1]].car = self
 
-
+    def move(self, direction):
+        match direction:
+            case 0:
+                self.move_right()
+            case 1:
+                self.move_up()
+            case 2:
+                self.move_left()
+            case 3:
+                self.move_down()
+            
+    
     def move_to_destination(self, lang):
         col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
         row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
@@ -303,6 +326,7 @@ class Car(QGraphicsRectItem):
         
         self.parking_lot.start_timer()
         
+        #move to init if it is garbage collected
         self.worker = WorkerThread(self.parking_spaces, destination, self.id, self.parking_lot, lang)
         self.worker.start()
         self.worker.finished.connect(self.evt_worker_finished)   
@@ -310,6 +334,7 @@ class Car(QGraphicsRectItem):
         self.worker.moves_signal.connect(self.write_1)
         self.worker.elapsed_time_calculation_signal.connect(self.write_2)
         self.worker.elapsed_time_moving_signal.connect(self.write_3)
+        self.worker.move_direction_signal.connect(self.move)
 
     def write_1(self, val):
         self.parking_lot.add_text_to_field(f"Number of moves: {val}, ")
