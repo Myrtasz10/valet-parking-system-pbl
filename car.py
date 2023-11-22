@@ -292,20 +292,9 @@ class Car(QGraphicsRectItem):
 
         self.parking_spaces[start_space[0]][start_space[1]].car = None 
         self.parking_spaces[end_space[0]][end_space[1]].car = self
-
-    def move(self, direction):
-        match direction:
-            case 0:
-                self.move_right()
-            case 1:
-                self.move_up()
-            case 2:
-                self.move_left()
-            case 3:
-                self.move_down()
             
     
-    def move_to_destination(self, lang, destination = None):
+    def move_to_destination(self, lang, destination):
         if destination == None:
             col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
             row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
@@ -369,7 +358,7 @@ class Car(QGraphicsRectItem):
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
             
-        moves, elapsed_time_calculation = self.move_to_destination(lang, (0, 0))
+        moves, elapsed_time_calculation = self.move_to_destination(lang, 0, 0)
         print(moves)
 
         self.setBrush(QColor('#000066'))
