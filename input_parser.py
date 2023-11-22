@@ -18,7 +18,7 @@ class Parser:
         self.depots_input.setEnabled(False)
         self.parking_spot_width_input = QLineEdit("5")
         self.parking_spot_height_input = QLineEdit("3")
-        self.speed_input = QLineEdit("4")
+        self.speed_input = QLineEdit("5")
         
         self.submit_button = QPushButton('Submit')
         self.submit_button.clicked.connect(self.on_submit)
