@@ -38,26 +38,26 @@ def move_car_to_destination_cpp(parking_spaces, destination, id):
     elapsed_time_calculation = end_time_calculation - start_time_calculation
     print(f"Elapsed time for Cpp version: {end_time_calculation} seconds")
 
-    start_time_moving = time.time()
+    # start_time_moving = time.time()
 
-    for move in moves:
-        direction, (src_x, src_y), (dest_x, dest_y) = move
+    # for move in moves:
+    #     direction, (src_x, src_y), (dest_x, dest_y) = move
 
-        if direction == 'right':
-            parking_spaces[src_x][src_y].car.move_right()
-        elif direction == 'up':
-            parking_spaces[src_x][src_y].car.move_up()
-        elif direction == 'left':
-            parking_spaces[src_x][src_y].car.move_left()
-        elif direction == 'down':
-            parking_spaces[src_x][src_y].car.move_down()
+    #     if direction == 'right':
+    #         parking_spaces[src_x][src_y].car.move_right()
+    #     elif direction == 'up':
+    #         parking_spaces[src_x][src_y].car.move_up()
+    #     elif direction == 'left':
+    #         parking_spaces[src_x][src_y].car.move_left()
+    #     elif direction == 'down':
+    #         parking_spaces[src_x][src_y].car.move_down()
 
-    end_time_moving = time.time()
-    elapsed_time_moving = end_time_moving - start_time_moving
+    # end_time_moving = time.time()
+    # elapsed_time_moving = end_time_moving - start_time_moving
 
-    parking_spaces[destination[0]][destination[1]].unsetAsDestination()
+    # parking_spaces[destination[0]][destination[1]].unsetAsDestination()
 
-    return moves, elapsed_time_calculation, elapsed_time_moving
+    return moves, elapsed_time_calculation, #elapsed_time_moving
 
 
 def move_car_to_destination_rust(parking_spaces, destination, id):
@@ -75,26 +75,26 @@ def move_car_to_destination_rust(parking_spaces, destination, id):
     elapsed_time_calculation = end_time_calculation - start_time_calculation
     print(f"Elapsed time for Rust version: {elapsed_time_calculation} seconds")
 
-    start_time_moving = time.time()
+    # start_time_moving = time.time()
 
-    for move in moves:
-        direction, (src_x, src_y), (dest_x, dest_y) = move
+    # for move in moves:
+    #     direction, (src_x, src_y), (dest_x, dest_y) = move
 
-        if direction == 'right':
-            parking_spaces[src_x][src_y].car.move_right()
-        elif direction == 'up':
-            parking_spaces[src_x][src_y].car.move_up()
-        elif direction == 'left':
-            parking_spaces[src_x][src_y].car.move_left()
-        elif direction == 'down':
-            parking_spaces[src_x][src_y].car.move_down()
+    #     if direction == 'right':
+    #         parking_spaces[src_x][src_y].car.move_right()
+    #     elif direction == 'up':
+    #         parking_spaces[src_x][src_y].car.move_up()
+    #     elif direction == 'left':
+    #         parking_spaces[src_x][src_y].car.move_left()
+    #     elif direction == 'down':
+    #         parking_spaces[src_x][src_y].car.move_down()
 
-    end_time_moving = time.time()
-    elapsed_time_moving = end_time_moving - start_time_moving
+    # end_time_moving = time.time()
+    # elapsed_time_moving = end_time_moving - start_time_moving
 
-    parking_spaces[destination[0]][destination[1]].unsetAsDestination()
+    # parking_spaces[destination[0]][destination[1]].unsetAsDestination()
 
-    return moves, elapsed_time_calculation, elapsed_time_moving
+    return moves, elapsed_time_calculation, #elapsed_time_moving
 
 
 def free_up_space_rust(parking_spaces, destination):

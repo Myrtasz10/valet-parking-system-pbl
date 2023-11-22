@@ -351,12 +351,12 @@ class Car(QGraphicsRectItem):
         elapsed_time_moving = end_time_moving - start_time_moving
 
         self.parking_spaces[self.destination[0]][self.destination[1]].unsetAsDestination()
-        self.parking_lot.add_text_to_field(f"Number of moves: {len(val)}, ")
+        self.parking_lot.add_text_to_field(f"number of moves: {len(val)}, ")
         self.parking_lot.add_text_to_field(f"moving time: {elapsed_time_moving:.2f} seconds\n\n")
+        self.parking_lot.stop_timer()
         
     def write_2(self, val):
-        self.parking_lot.add_text_to_field(f"calculation time: {val*1000:.2f} milliseconds, ")
-        self.parking_lot.stop_timer()
+        self.parking_lot.add_text_to_field(f"Calculation time: {val*1000:.2f} milliseconds, ")
         
     def move_to_depot_rust(self):
         self.is_moving = True
@@ -387,4 +387,3 @@ class Car(QGraphicsRectItem):
     def evt_worker_finished(self):
         self.setBrush(QColor('#000066'))
         self.is_moving = False
-        self.parking_lot.stop_timer()
