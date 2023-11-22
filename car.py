@@ -9,10 +9,6 @@ from A_star import move_car_to_destination
 from A_star_libs import move_car_to_destination_cpp, move_car_to_destination_rust
 import time
 
-class MovesList:
-    def __init__(self, moves_list):
-        self.moves_list = moves_list
-
 class WorkerThread(QThread):
     moves_list_signal = pyqtSignal(list)
     elapsed_time_calculation_signal = pyqtSignal(float)
@@ -21,7 +17,7 @@ class WorkerThread(QThread):
     #1- up
     #2- left
     #3- down
-    move_direction_signal = pyqtSignal(int)
+    # move_direction_signal = pyqtSignal(int)
     
     
     def __init__(self, parking_spaces, destination, car_id, parking_lot, lang, parent=None):
@@ -41,17 +37,17 @@ class WorkerThread(QThread):
         print("starting calculation")
         match self.lang:
             case "python":        
-                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination(self.parking_spaces, self.destination, self.car_id)
+                moves, elapsed_time_calculation = move_car_to_destination(self.parking_spaces, self.destination, self.car_id)
             case "cpp":        
-                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_cpp(self.parking_spaces, self.destination, self.car_id)
+                moves, elapsed_time_calculation = move_car_to_destination_cpp(self.parking_spaces, self.destination, self.car_id)
             case "rust":        
-                moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, self.destination, self.car_id)
+                moves, elapsed_time_calculation = move_car_to_destination_rust(self.parking_spaces, self.destination, self.car_id)
         print("ending calculation")
         print(moves)
 
-        self.moves_signal.emit(len(moves))
+        self.moves_list_signal.emit(moves)
         self.elapsed_time_calculation_signal.emit(elapsed_time_calculation)
-        self.elapsed_time_moving_signal.emit(elapsed_time_moving)
+        #self.elapsed_time_moving_signal.emit(elapsed_time_moving)
         #policz i zwróć na główny wątek od razu, stąd będziemy wywoływać przesunięcia
         #PROBLEM NIE LEŻY TUTAJ, TO OBLICZENIA UŻYWAJĄ TIMERÓW
         #STOPPING TIMER TWICE?
@@ -317,7 +313,7 @@ class Car(QGraphicsRectItem):
         self.setBrush(QColor('#ff0000'))
 
         if ok1 and ok2:
-            destination = (col, row)
+            self.destination = (col, row)
 
         else:
             self.setBrush(QColor('#000066'))
@@ -327,23 +323,39 @@ class Car(QGraphicsRectItem):
         self.parking_lot.start_timer()
         
         #move to init if it is garbage collected
-        self.worker = WorkerThread(self.parking_spaces, destination, self.id, self.parking_lot, lang)
+        self.worker = WorkerThread(self.parking_spaces, self.destination, self.id, self.parking_lot, lang)
         self.worker.start()
         self.worker.finished.connect(self.evt_worker_finished)   
         
-        self.worker.moves_signal.connect(self.write_1)
+        self.worker.moves_list_signal.connect(self.write_move_1)
         self.worker.elapsed_time_calculation_signal.connect(self.write_2)
-        self.worker.elapsed_time_moving_signal.connect(self.write_3)
-        self.worker.move_direction_signal.connect(self.move)
+        # self.worker.move_direction_signal.connect(self.move)
 
-    def write_1(self, val):
-        self.parking_lot.add_text_to_field(f"Number of moves: {val}, ")
+    def write_move_1(self, val):
+        start_time_moving = time.time()
+
+        for move in val:
+            direction, (src_x, src_y), (dest_x, dest_y) = move
+
+            # signals for this
+            if direction == 'right':
+                self.parking_spaces[src_x][src_y].car.move_right()
+            elif direction == 'up':
+                self.parking_spaces[src_x][src_y].car.move_up()
+            elif direction == 'left':
+                self.parking_spaces[src_x][src_y].car.move_left()
+            elif direction == 'down':
+                self.parking_spaces[src_x][src_y].car.move_down()
+
+        end_time_moving = time.time()
+        elapsed_time_moving = end_time_moving - start_time_moving
+
+        self.parking_spaces[self.destination[0]][self.destination[1]].unsetAsDestination()
+        self.parking_lot.add_text_to_field(f"Number of moves: {len(val)}, ")
+        self.parking_lot.add_text_to_field(f"moving time: {elapsed_time_moving:.2f} seconds\n\n")
         
     def write_2(self, val):
         self.parking_lot.add_text_to_field(f"calculation time: {val*1000:.2f} milliseconds, ")
-        
-    def write_3(self, val):
-        self.parking_lot.add_text_to_field(f"moving time: {val:.2f} seconds\n\n")
         self.parking_lot.stop_timer()
         
     def move_to_depot_rust(self):

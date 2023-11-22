@@ -25,27 +25,7 @@ def move_car_to_destination(parking_spaces, destination, id):
     elapsed_time_calculation = end_time_calculation - start_time_calculation
     print(f"Elapsed time for Python version: {elapsed_time_calculation} seconds")
 
-    start_time_moving = time.time()
-
-    for move in moves:
-        direction, (src_x, src_y), (dest_x, dest_y) = move
-
-        # signals for this
-        if direction == 'right':
-            parking_spaces[src_x][src_y].car.move_right()
-        elif direction == 'up':
-            parking_spaces[src_x][src_y].car.move_up()
-        elif direction == 'left':
-            parking_spaces[src_x][src_y].car.move_left()
-        elif direction == 'down':
-            parking_spaces[src_x][src_y].car.move_down()
-
-    end_time_moving = time.time()
-    elapsed_time_moving = end_time_moving - start_time_moving
-
-    parking_spaces[destination[0]][destination[1]].unsetAsDestination()
-
-    return moves, elapsed_time_calculation, elapsed_time_moving
+    return moves, elapsed_time_calculation
 
 def free_up_space(parking_spaces, target_coords):
     start_state = parking_spaces_to_ids(parking_spaces)
