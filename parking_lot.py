@@ -10,8 +10,8 @@ from PyQt5.QtWidgets import QMessageBox
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
 #TODO: change to rust
-# from A_star import free_up_space
-from A_star_libs import free_up_space_rust as free_up_space
+from A_star import free_up_space
+#from A_star_libs import free_up_space_rust as free_up_space
 
 def process_moves(filename, parking_lot):
     parking_lot.steps = []
@@ -52,6 +52,7 @@ class ParkingLot(QWidget):
         self.addGrid()
 
         self.timer_label = QLabel('Elapsed Time: 00:00:00', self)
+        self.timer_label.setFont(QFont('Arial', 20))
         self.layout.addWidget(self.timer_label)
 
         self.timer = QTimer(self)
@@ -72,7 +73,7 @@ class ParkingLot(QWidget):
 
         self.text_edit = QTextEdit(self)
         self.text_edit.setFixedHeight(200)
-        self.text_edit.setFont(QFont('Arial', 10))
+        self.text_edit.setFont(QFont('Arial', 20))
         self.text_edit.setReadOnly(True)
         self.layout.addWidget(self.text_edit)
 

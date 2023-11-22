@@ -44,17 +44,6 @@ class WorkerThread(QThread):
 
         self.moves_list_signal.emit(moves)
         self.elapsed_time_calculation_signal.emit(elapsed_time_calculation)
-        #self.elapsed_time_moving_signal.emit(elapsed_time_moving)
-        #policz i zwróć na główny wątek od razu, stąd będziemy wywoływać przesunięcia
-        #PROBLEM NIE LEŻY TUTAJ, TO OBLICZENIA UŻYWAJĄ TIMERÓW
-        #STOPPING TIMER TWICE?
-        #still nie działa
-        #TODO: take stop and print out of here, this may cause the timer issues - you shouldn't access stuff from another thread
-        # self.parking_lot.add_text_to_field(f"Number of moves: {len(moves)}, calculation time: {elapsed_time_calculation*1000:.2f} milliseconds, moving time: {elapsed_time_moving:.2f} seconds")
-        # # Prepare the message to display
-        # message = f"Number of moves: {len(moves)}\nCalculation time: {elapsed_time_calculation:.2f} seconds\nMoving time: {elapsed_time_moving:.2f} seconds"
-        # # Display the result in a pop-up message box
-        # QMessageBox.information(None, "Movement Results", message)
     
         
 
