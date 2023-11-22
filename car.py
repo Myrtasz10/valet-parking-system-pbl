@@ -305,20 +305,25 @@ class Car(QGraphicsRectItem):
                 self.move_down()
             
     
-    def move_to_destination(self, lang):
-        col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
-        row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+    def move_to_destination(self, lang, destination = None):
+        if destination == None:
+            col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
+            row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
+
+            if ok1 and ok2:
+                self.destination = (col, row)
+
+            else:
+                self.setBrush(QColor('#000066'))
+                self.is_moving = False
+                return
         
+        else:
+            self.destination = destination
+
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
 
-        if ok1 and ok2:
-            self.destination = (col, row)
-
-        else:
-            self.setBrush(QColor('#000066'))
-            self.is_moving = False
-            return
         
         self.parking_lot.start_timer()
         
@@ -354,27 +359,29 @@ class Car(QGraphicsRectItem):
         self.parking_lot.add_text_to_field(f"number of moves: {len(val)}, ")
         self.parking_lot.add_text_to_field(f"moving time: {elapsed_time_moving:.2f} seconds\n\n")
         self.parking_lot.stop_timer()
+        self.setBrush(QColor('#000066'))
+        self.is_moving = False
         
     def write_2(self, val):
         self.parking_lot.add_text_to_field(f"Calculation time: {val*1000:.2f} milliseconds, ")
         
-    def move_to_depot_rust(self):
+    def move_to_depot(self, lang):
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
             
-        moves, elapsed_time_calculation, elapsed_time_moving = move_car_to_destination_rust(self.parking_spaces, (0, 0), self.id)
+        moves, elapsed_time_calculation = self.move_to_destination(lang, (0, 0))
         print(moves)
 
         self.setBrush(QColor('#000066'))
         self.is_moving = False
 
         
-    def move_to_depot(self):
-        for parking_column in self.parking_spaces:
-            for parking_space in parking_column:
-                print(parking_space.occupied)
-        self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
-        self.parking_lot.animateToDepot()
+    # def move_to_depot(self):
+    #     for parking_column in self.parking_spaces:
+    #         for parking_space in parking_column:
+    #             print(parking_space.occupied)
+    #     self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
+    #     self.parking_lot.animateToDepot()
         
         
     def remove(self):
@@ -385,5 +392,4 @@ class Car(QGraphicsRectItem):
         self.parking_lot.parking_spaces[self.col][self.row].occupied = False
         
     def evt_worker_finished(self):
-        self.setBrush(QColor('#000066'))
-        self.is_moving = False
+        pass

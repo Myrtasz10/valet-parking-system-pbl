@@ -167,7 +167,7 @@ class ParkingLot(QWidget):
         for col in self.parking_spaces:
             for space in col:
                 if space.occupied and space.car.id == car_id:
-                    space.car.move_to_depot_rust()
+                    space.car.move_to_depot('rust')
                     self.removeCarFromDetpot()
                     return  # Stop after removing the car
 
