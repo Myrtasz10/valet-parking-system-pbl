@@ -9,22 +9,17 @@ from PyQt5.QtWidgets import QMessageBox
 
 from car import Car
 from parking_space import ParkingSpace, ParkingSpaceSingleton
+#TODO: change to rust
 from A_star import free_up_space
 #from A_star_libs import free_up_space_rust as free_up_space
 
 def process_moves(filename, parking_lot):
+    parking_lot.steps = []
     with open(filename, 'r') as file:
         for line in file:
             action, car_id_str = line[0], line[1:].strip()  # Split the action (+/-) and car ID
-            
-            if action == '+':  # If the action is to add a car
-                parking_lot.addCarAtDepot()
-            elif action == '-':  # If the action is to remove a car
-                car_id = int(car_id_str)
-                parking_lot.remove_car(car_id)  # Assuming remove_car is a method to remove cars
-            else:
-                print(f"Invalid action in line: {line}")
-
+            parking_lot.steps.append((action, car_id_str))
+        parking_lot.moves_next()
             # parking_lot.cooldown(5000)
 
 class ParkingLot(QWidget):
@@ -37,6 +32,7 @@ class ParkingLot(QWidget):
         parking_singleton.parking_spaces = self.parking_spaces 
 
         self.cars = []
+        self.steps = []
         #4D
         self.histories = []
         self.parking_width = int(parser.parking_spot_width) * 50
@@ -162,13 +158,13 @@ class ParkingLot(QWidget):
 
 
         self.parking_spaces[col][row].car.remove()
-
+    #TODO: change to rust
     def remove_car(self, car_id):
         for col in self.parking_spaces:
             for space in col:
                 if space.occupied and space.car.id == car_id:
-                    space.car.move_to_depot('rust')
-                    self.removeCarFromDetpot()
+                    space.car.move_to_destination('python', 0, 0) #trzeba zrobić łańcuch, tylko jak? (dokładniej w wywołaniach z pliku, u góry) może niech wywołanie tego u góry się przerywa, a potem wznawia w sytuacji kiedy auto zawoła? taki sygnał często wysyłany z którym można coś zrobić lub nie
+                    #self.removeCarFromDetpot()
                     return  # Stop after removing the car
 
     def contextMenuEvent(self, event):
@@ -184,6 +180,24 @@ class ParkingLot(QWidget):
         contextMenu.addAction(freeSpace)
         
         contextMenu.exec_(event.globalPos())
+
+    def moves_next(self):
+        if len(self.steps) == 0:
+            return
+        action = self.steps[0][0]
+        car_id_str = self.steps[0][1]
+        print(f"{action}{car_id_str}")
+        self.steps.pop(0)
+        if action == '+':  # If the action is to add a car
+            self.addCarAtDepot()
+            self.moves_next()
+            return
+        elif action == '-':  # If the action is to remove a car
+            car_id = int(car_id_str)
+            self.remove_car(car_id)  # Assuming remove_car is a method to remove cars
+        else:
+            print("Invalid action!")
+                    
 
     def addGrid(self):
         for col in range(self.num_cols):

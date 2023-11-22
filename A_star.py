@@ -18,9 +18,7 @@ def move_car_to_destination(parking_spaces, destination, id):
     parking_spaces[destination[0]][destination[1]].setAsDestination()
 
     start_time_calculation = time.time()
-
     moves = a_star_parking(start_state, target_car_id, destination)
-
     end_time_calculation = time.time()
     elapsed_time_calculation = end_time_calculation - start_time_calculation
     print(f"Elapsed time for Python version: {elapsed_time_calculation} seconds")

@@ -13,12 +13,6 @@ class WorkerThread(QThread):
     moves_list_signal = pyqtSignal(list)
     elapsed_time_calculation_signal = pyqtSignal(float)
     elapsed_time_moving_signal = pyqtSignal(float)
-    # 0 - right
-    #1- up
-    #2- left
-    #3- down
-    # move_direction_signal = pyqtSignal(int)
-    
     
     def __init__(self, parking_spaces, destination, car_id, parking_lot, lang, parent=None):
         super(WorkerThread, self).__init__(parent)
@@ -40,8 +34,11 @@ class WorkerThread(QThread):
                 moves, elapsed_time_calculation = move_car_to_destination(self.parking_spaces, self.destination, self.car_id)
             case "cpp":        
                 moves, elapsed_time_calculation = move_car_to_destination_cpp(self.parking_spaces, self.destination, self.car_id)
-            case "rust":        
+            case "rust":   
                 moves, elapsed_time_calculation = move_car_to_destination_rust(self.parking_spaces, self.destination, self.car_id)
+            case _:
+                print("WRONG LANGUAGE! CHECK FOR TYPOS")
+                return
         print("ending calculation")
         print(moves)
 
@@ -294,8 +291,9 @@ class Car(QGraphicsRectItem):
         self.parking_spaces[end_space[0]][end_space[1]].car = self
             
     
-    def move_to_destination(self, lang, destination):
-        if destination == None:
+    def move_to_destination(self, lang, destination_col = None, destination_row = None):
+        
+        if destination_col == None or destination_row == None:
             col, ok1 = QInputDialog.getInt(None, "Input", "Enter destination column:")
             row, ok2 = QInputDialog.getInt(None, "Input", "Enter destination row:")
 
@@ -306,9 +304,11 @@ class Car(QGraphicsRectItem):
                 self.setBrush(QColor('#000066'))
                 self.is_moving = False
                 return
-        
+            #hardcoded for read from file requests
+            self.remove_afterwards = False
         else:
-            self.destination = destination
+            self.remove_afterwards = True
+            self.destination = (destination_col, destination_row)
 
         self.is_moving = True
         self.setBrush(QColor('#ff0000'))
@@ -350,27 +350,31 @@ class Car(QGraphicsRectItem):
         self.parking_lot.stop_timer()
         self.setBrush(QColor('#000066'))
         self.is_moving = False
+        self.parking_lot.moves_next()
+        if self.remove_afterwards:
+            self.parking_lot.removeCarFromDetpot()
         
     def write_2(self, val):
         self.parking_lot.add_text_to_field(f"Calculation time: {val*1000:.2f} milliseconds, ")
         
-    def move_to_depot(self, lang):
-        self.is_moving = True
-        self.setBrush(QColor('#ff0000'))
+    # this function is now redundant; call move_to_destination with extra parameters instead
+    # def move_to_depot(self, lang):
+    #     self.is_moving = True
+    #     self.setBrush(QColor('#ff0000'))
             
-        moves, elapsed_time_calculation = self.move_to_destination(lang, 0, 0)
-        print(moves)
+    #     moves, elapsed_time_calculation = self.move_to_destination(lang, 0, 0)
+    #     print(moves)
 
-        self.setBrush(QColor('#000066'))
-        self.is_moving = False
+    #     self.setBrush(QColor('#000066'))
+    #     self.is_moving = False
 
         
-    # def move_to_depot(self):
-    #     for parking_column in self.parking_spaces:
-    #         for parking_space in parking_column:
-    #             print(parking_space.occupied)
-    #     self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
-    #     self.parking_lot.animateToDepot()
+    def move_to_depot(self):
+        for parking_column in self.parking_spaces:
+            for parking_space in parking_column:
+                print(parking_space.occupied)
+        self.parking_lot.pathfindToDepot(self.col, self.row, [], self.parking_lot.mapParkingLot())
+        self.parking_lot.animateToDepot()
         
         
     def remove(self):
